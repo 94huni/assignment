@@ -14,9 +14,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.authorizeRequests()
+        http
+                .authorizeRequests()
+                .antMatchers("/api/**/admin").hasRole("ADMIN")
+                .antMatchers("/api/**/signUp").permitAll()
+                .antMatchers("/swagger-ui.html",
+                        "/swagger-ui/**", "/v2/api-docs",
+                        "/v3/api-docs", "/swagger-resources/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                /*.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
-                .anyRequest().permitAll();
+                .and()*/
+                .formLogin().loginPage("/login").permitAll()
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login").permitAll();
     }
 
     @Bean
