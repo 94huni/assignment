@@ -14,5 +14,7 @@ public class MemberSignUp {
 
     private String validPassword;
 
+    private String phone;
+
     private String email;
 }

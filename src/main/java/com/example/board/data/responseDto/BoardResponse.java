@@ -1,6 +1,5 @@
 package com.example.board.data.responseDto;
 
-import com.example.board.data.entity.Board;
 import lombok.Data;
 
 import java.time.LocalDateTime;
