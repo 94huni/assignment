@@ -4,6 +4,7 @@ import com.example.board.data.entity.Member;
 import com.example.board.data.entity.Role;
 import com.example.board.data.requestDto.MemberSignUp;
 import com.example.board.data.requestDto.MemberUpdate;
+import com.example.board.data.responseDto.MemberResponse;
 import com.example.board.exception.CustomException;
 import com.example.board.exception.ErrorCode;
 import com.example.board.repository.MemberRepository;
@@ -22,6 +23,22 @@ import java.time.LocalDateTime;
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    @Override
+    public MemberResponse getMember(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+
+        return MemberResponse.builder()
+                .id(member.getMId())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .userName(member.getUsername())
+                .phone(member.getPhone())
+                .createAt(member.getCreateAt())
+                .updateAt(member.getUpdateAt())
+                .build();
+    }
 
     @Override
     @Transactional
@@ -61,6 +78,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean validPassword(String password, String validPassword) {
         return password.equals(validPassword);
+    }
+
+    @Override
+    public boolean validEmail(String email) {
+        return memberRepository.existsByEmail(email);
     }
 
     @Override
