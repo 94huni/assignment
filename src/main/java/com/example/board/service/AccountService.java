@@ -1,5 +1,7 @@
 package com.example.board.service;
 
+import com.example.board.exception.CustomException;
+import com.example.board.exception.ErrorCode;
 import com.example.board.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +17,8 @@ public class AccountService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return memberRepository.findByEmail(email);
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
 }
