@@ -76,7 +76,7 @@ public class MemberServiceImpl implements MemberService {
             Member result = Member.builder()
                     .mId(member.getMId())
                     .nickname(memberUpdate.getNickname())
-                    .password(memberUpdate.getPassword())
+                    .password(passwordEncoder.encode(memberUpdate.getPassword()))
                     .updateAt(LocalDateTime.now())
                     .build();
 
