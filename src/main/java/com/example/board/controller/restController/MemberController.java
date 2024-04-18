@@ -28,11 +28,16 @@ public class MemberController {
     private final AccountService accountService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginMember(@RequestBody @Valid SignIn signIn) {
-        Member member = memberService.findMember(signIn);
-        log.info("Member Email : {}", signIn.getEmail());
-        Member result = (Member) accountService.loadUserByUsername(member.getEmail());
-        return ResponseEntity.ok(result.getUsername() + " login successful");
+    public ResponseEntity<Map<String, String>> loginMember(@RequestBody @Valid SignIn signIn) {
+        String token = memberService.signIn(signIn);
+
+        Map<String, String> res = new HashMap<>();
+        res.put("token", token);
+        // 유저이름 + 닉네임 추가 필요
+
+        log.info("Member Token : {}", signIn.getEmail());
+
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/signUp")
