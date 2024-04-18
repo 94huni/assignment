@@ -1,9 +1,11 @@
 package com.example.board.service;
 
+import com.example.board.config.jwt.JwtProvider;
 import com.example.board.data.entity.Member;
 import com.example.board.data.entity.Role;
 import com.example.board.data.requestDto.MemberSignUp;
 import com.example.board.data.requestDto.MemberUpdate;
+import com.example.board.data.requestDto.SignIn;
 import com.example.board.data.responseDto.MemberResponse;
 import com.example.board.exception.CustomException;
 import com.example.board.exception.ErrorCode;
@@ -11,6 +13,9 @@ import com.example.board.repository.MemberRepository;
 import com.example.board.service.impl.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +28,44 @@ import java.time.LocalDateTime;
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthenticationManager manager;
+    private final JwtProvider jwtProvider;
+
+    @Override
+    public Member findMember(SignIn signIn) {
+        Member member = memberRepository.findByEmail(signIn.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+
+        if(!member.getPassword().equals(signIn.getPassword())) {
+            throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
+        }
+
+        return member;
+    }
+
+    @Override
+    public String currentMember(String token) {
+        return jwtProvider.getUsername(token);
+    }
+
+    @Override
+    public String signIn(SignIn signIn) {
+        try {
+
+            manager.authenticate(new
+                    UsernamePasswordAuthenticationToken(signIn.getEmail(), signIn.getPassword()));
+
+            Member member = memberRepository.findByEmail(signIn.getEmail())
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+
+            return jwtProvider.createToken(signIn.getEmail(), member.getRole());
+
+        }catch (AuthenticationException e) {
+
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+
+        }
+    }
 
     @Override
     public MemberResponse getMember(String email) {
@@ -66,6 +109,7 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.save(member);
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -87,7 +131,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void updateMember(MemberUpdate memberUpdate, Member member) {
+    public void updateMember(MemberUpdate memberUpdate, String token) {
         try {
             if (!memberUpdate.getPassword().equals(memberUpdate.getValidPassword()))
                 throw new CustomException(ErrorCode.DIFFERENT_PASSWORD);
@@ -95,8 +139,10 @@ public class MemberServiceImpl implements MemberService {
             if(memberRepository.existsByNickname(memberUpdate.getNickname()))
                 throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
 
+            MemberResponse member = getMember(jwtProvider.getUsername(token));
+
             Member result = Member.builder()
-                    .mId(member.getMId())
+                    .mId(member.getId())
                     .nickname(memberUpdate.getNickname())
                     .password(passwordEncoder.encode(memberUpdate.getPassword()))
                     .updateAt(LocalDateTime.now())
@@ -105,6 +151,7 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.save(result);
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 }
