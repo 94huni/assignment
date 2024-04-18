@@ -16,8 +16,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,17 +54,19 @@ public class MemberController {
 
     @PutMapping("/update/{email}")
     public ResponseEntity<String> memberUpdate(@PathVariable String email,
-                                               Principal principal,
+                                               String token,
                                                @Valid @RequestBody MemberUpdate memberUpdate) {
 
-        if (email.equals(principal.getName())) {
+        String currentMember = memberService.currentMember(token);
+
+        if (email.equals(currentMember)) {
             memberService.getMember(email);
         } else {
             throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
         }
 
-        memberService.updateMember(memberUpdate, (Member) principal);
-        log.info("principal email : {}", ((Member) principal).getEmail());
+        memberService.updateMember(memberUpdate, token);
+        log.info("Current Member email : {}", currentMember);
 
         return ResponseEntity.ok("Successfully changed membership information");
     }
