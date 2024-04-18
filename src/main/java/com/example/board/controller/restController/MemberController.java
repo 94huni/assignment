@@ -29,7 +29,6 @@ import java.util.Map;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
-    private final AccountService accountService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginMember(@RequestBody @Valid SignIn signIn) {
@@ -59,7 +58,8 @@ public class MemberController {
                                                @Valid @RequestBody MemberUpdate memberUpdate) {
 
         String token = (String) request.getAttribute("token");
-        
+        log.info(request.toString());
+
         String currentMember = memberService.currentMember(token);
 
         if (email.equals(currentMember)) {
