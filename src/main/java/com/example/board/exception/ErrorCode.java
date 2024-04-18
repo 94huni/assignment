@@ -12,9 +12,11 @@ public enum ErrorCode {
     DIFFERENT_PASSWORD(HttpStatus.CONFLICT, "409 password is duplicated"),
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "409 Email is duplicated"),
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "404 Email is Not found"),
+    NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "404 Board is Not found"),
     NOT_FORBIDDEN_MEMBER(HttpStatus.FORBIDDEN, "403 No access rights"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "401 Please check your Email or Password"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "500 INTERNAL_SERVER_ERROR");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "500 INTERNAL_SERVER_ERROR"),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "400 Bad Request");
 
 
     private final HttpStatus status;
