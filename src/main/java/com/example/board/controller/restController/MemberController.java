@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
@@ -54,9 +55,11 @@ public class MemberController {
 
     @PutMapping("/update/{email}")
     public ResponseEntity<String> memberUpdate(@PathVariable String email,
-                                               @RequestHeader("Authorization") String token,
+                                               HttpServletRequest request,
                                                @Valid @RequestBody MemberUpdate memberUpdate) {
 
+        String token = (String) request.getAttribute("token");
+        
         String currentMember = memberService.currentMember(token);
 
         if (email.equals(currentMember)) {
