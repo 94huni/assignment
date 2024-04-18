@@ -53,4 +53,28 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRepository.getById(bId);
         return toEntity(board);
     }
+    @Override
+    @Transactional
+    public void createBoard(BoardCreate create, Member member) {
+
+        try {
+            if (create.getTitle()!=null) {
+                throw new CustomException(ErrorCode.BAD_REQUEST);
+            }
+
+            Board board = Board.builder()
+                    .createAt(LocalDateTime.now())
+                    .title(create.getTitle())
+                    .content(create.getContent())
+                    .member(member)
+                    .build();
+
+            boardRepository.save(board);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }
