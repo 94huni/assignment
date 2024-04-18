@@ -105,4 +105,25 @@ public class BoardServiceImpl implements BoardService {
 
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteBoard(int bId, Member member) {
+        try {
+
+            Board board = boardRepository.findById(bId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
+            if (board.getMember().getMId() != member.getMId())
+                throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+
+        }
+
+    }
+
 }
