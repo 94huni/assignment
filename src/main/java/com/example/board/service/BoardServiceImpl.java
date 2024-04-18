@@ -126,4 +126,17 @@ public class BoardServiceImpl implements BoardService {
 
     }
 
+    @Override
+    public Page<BoardResponse> boardList(String keyword, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+
+        Page<Board> boards;
+
+        if (keyword == null) {
+            boards = boardRepository.findAllByBIdDesc(pageable);
+        } else {
+            boards = boardRepository.findBoardByTitleOrContentContainingOrderByBIdDesc(keyword, pageable);
+        }
+        return toEntity(boards);
+    }
 }
