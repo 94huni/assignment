@@ -53,6 +53,7 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRepository.getById(bId);
         return toEntity(board);
     }
+
     @Override
     @Transactional
     public void createBoard(BoardCreate create, Member member) {
@@ -76,5 +77,32 @@ public class BoardServiceImpl implements BoardService {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @Override
+    @Transactional
+    public void updateBoard(int bId, BoardUpdate boardUpdate, MemberResponse member) {
+        try {
+                Board board = boardRepository.findById(bId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
+                if (board.getMember().getMId() != member.getId())
+                    throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
+
+                Board result = Board.builder()
+                    .bId(board.getBId())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .updateAt(LocalDateTime.now())
+                    .build();
+
+                boardRepository.save(result);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+
+        }
     }
 }
