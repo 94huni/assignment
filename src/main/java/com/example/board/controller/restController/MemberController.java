@@ -54,7 +54,7 @@ public class MemberController {
 
     @PutMapping("/update/{email}")
     public ResponseEntity<String> memberUpdate(@PathVariable String email,
-                                               String token,
+                                               @RequestHeader("Authorization") String token,
                                                @Valid @RequestBody MemberUpdate memberUpdate) {
 
         String currentMember = memberService.currentMember(token);
