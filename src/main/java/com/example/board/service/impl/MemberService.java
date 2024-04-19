@@ -12,7 +12,7 @@ public interface MemberService {
 
     String currentMember(String token);
 
-    Member findMember(SignIn signIn);
+    Member findMember(String token);
 
     String signIn(SignIn signIn);
 
