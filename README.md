@@ -1,6 +1,6 @@
  # board project
 
- ## 기술 스택
+ ## 사용된 기술
 
 ### - Backend : 
  - Java : 사용된 버전 17
@@ -12,7 +12,7 @@
  - JWT 
 
 ### - API 관리 : 
- - Swagger
+ - Swagger 3.0
 
 
 ### - Database : 
