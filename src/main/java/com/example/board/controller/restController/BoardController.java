@@ -44,4 +44,20 @@ public class BoardController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Post creation was successful");
     }
+
+    @PutMapping("/update/{bId}")
+    public ResponseEntity<String> updateBoard(@PathVariable int bId,
+                                              @RequestBody BoardUpdate update,
+                                              HttpServletRequest req) {
+        String token = (String) req.getAttribute("token");
+
+        Member member = memberService.findMember(token);
+
+        MemberResponse res = memberService.getMember(member.getEmail());
+
+        boardService.updateBoard(bId, update, res);
+
+        return ResponseEntity.ok("Update Successful");
+    }
+
 }
