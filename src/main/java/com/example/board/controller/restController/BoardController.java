@@ -26,4 +26,11 @@ public class BoardController {
     public ResponseEntity<BoardResponse> getBoard(@PathVariable int bId) {
         return ResponseEntity.ok(boardService.getBoard(bId));
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<Page<BoardResponse>> getBoards(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(required = false) String keyword) {
+        return ResponseEntity.ok(boardService.boardList(keyword, page));
+    }
+
 }
