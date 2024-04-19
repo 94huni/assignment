@@ -60,4 +60,14 @@ public class BoardController {
         return ResponseEntity.ok("Update Successful");
     }
 
+    @DeleteMapping("/delete/{bId}")
+    public ResponseEntity<String> deleteBoard(@PathVariable int bId,
+                                              HttpServletRequest req) {
+        String token = (String) req.getAttribute("token");
+        Member member = memberService.findMember(token);
+
+        boardService.deleteBoard(bId, member);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete Successful");
+    }
 }
