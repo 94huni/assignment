@@ -4,6 +4,7 @@ import com.example.board.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Component
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
 
@@ -29,6 +31,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             res.sendError(e.getErrorCode().getStatus().value(), e.getErrorCode().getMessage());
             return;
         }
+
+
         filterChain.doFilter(req, res);
     }
 }
