@@ -33,4 +33,15 @@ public class BoardController {
         return ResponseEntity.ok(boardService.boardList(keyword, page));
     }
 
+    @PostMapping("/post")
+    public ResponseEntity<String> createBoard(@RequestBody BoardCreate boardCreate, HttpServletRequest req) {
+
+        String token = (String) req.getAttribute("token");
+
+        Member member = memberService.findMember(token);
+
+        boardService.createBoard(boardCreate, member);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Post creation was successful");
+    }
 }
