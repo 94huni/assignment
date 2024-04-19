@@ -32,15 +32,11 @@ public class MemberServiceImpl implements MemberService {
     private final JwtProvider jwtProvider;
 
     @Override
-    public Member findMember(SignIn signIn) {
-        Member member = memberRepository.findByEmail(signIn.getEmail())
+    public Member findMember(String token) {
+        String email = jwtProvider.getUsername(token);
+
+        return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
-
-        if(!member.getPassword().equals(signIn.getPassword())) {
-            throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
-        }
-
-        return member;
     }
 
     @Override
