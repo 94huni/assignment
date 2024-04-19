@@ -133,9 +133,9 @@ public class BoardServiceImpl implements BoardService {
         Page<Board> boards;
 
         if (keyword == null) {
-            boards = boardRepository.findAllByBIdDesc(pageable);
+            boards = boardRepository.findAllByOrderByBIdDesc(pageable);
         } else {
-            boards = boardRepository.findBoardByTitleOrContentContainingOrderByBIdDesc(keyword, pageable);
+            boards = boardRepository.findBoardByTitleOrContentContainingOrderByBIdDesc(keyword, null, pageable);
         }
         return toEntity(boards);
     }
