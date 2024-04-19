@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Integer> {
-    Page<Board> findAllByBIdDesc(Pageable pageable);
-    Page<Board> findBoardByTitleOrContentContainingOrderByBIdDesc(String keyword, Pageable pageable);
+    Page<Board> findAllByOrderByBIdDesc(Pageable pageable);
+    Page<Board> findBoardByTitleOrContentContainingOrderByBIdDesc(String titleKeyword, String contentKeyword, Pageable pageable);
 
 }
