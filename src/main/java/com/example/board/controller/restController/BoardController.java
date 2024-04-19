@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api-v2")
+@RequestMapping("/api/v1/board")
 public class BoardController {
     private final BoardService boardService;
     private final MemberService memberService;
