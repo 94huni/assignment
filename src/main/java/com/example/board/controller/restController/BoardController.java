@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api-v2")
 public class BoardController {
     private final BoardService boardService;
+    private final MemberService memberService;
 
     @GetMapping("/detail/{bId}")
     public ResponseEntity<BoardResponse> getBoard(@PathVariable int bId) {
