@@ -82,7 +82,8 @@
   - Success Response Status Code: `200 OK`
   - Response Format: JSON
 
-## 게시글 삭제
+### 게시글 삭제
+
 - **요청**
   - Request Method: `DELETE`
   - URL: `/board/delete/{board_id}`
