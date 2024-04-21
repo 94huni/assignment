@@ -7,9 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Integer> {
-    Page<Board> findAllByOrderByBIdDesc(Pageable pageable);
-    Page<Board> findBoardByTitleOrContentContainingOrderByBIdDesc(String titleKeyword, String contentKeyword, Pageable pageable);
+    Page<Board> findAllByOrderByCreateAtDesc(Pageable pageable);
+    Page<Board> findBoardByTitleOrContentContainingOrderByCreateAtDesc(String titleKeyword, String contentKeyword, Pageable pageable);
 
 }
