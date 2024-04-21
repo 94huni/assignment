@@ -12,6 +12,7 @@ public class CustomExceptionHandler {
     public ResponseEntity<ErrorResponse> customExceptionHandler(CustomException e) {
         return ResponseEntity
                 .ok(new ErrorResponse(e.getErrorCode().getStatus().toString(),
+                .status(e.getErrorCode().getStatus()).body(new ErrorResponse(e.getErrorCode().getStatus().toString(),
                         e.getErrorCode().getMessage()));
     }
 
