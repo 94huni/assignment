@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class BoardResponse {
+    private int bId;
     private String nickname;
     private String title;
     private String content;
