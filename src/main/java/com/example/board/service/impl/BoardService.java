@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 public interface BoardService {
     BoardResponse getBoard(int bId);
     void createBoard(BoardCreate create, Member member);
-    void updateBoard(int bId, BoardUpdate boardUpdate, MemberResponse member);
+    void updateBoard(int bId, BoardUpdate boardUpdate, Member member);
     void deleteBoard(int bId, Member member);
     Page<BoardResponse> boardList(String keyword, int page);
 }
