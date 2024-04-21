@@ -41,15 +41,14 @@ public class BoardServiceImpl implements BoardService {
 
         return boardResponse;
     }
-
-    private Page<BoardResponse> toEntity(Page<Board> boards) {
+    
+    public Page<BoardResponse> toEntity(Page<Board> boards) {
         ModelMapper modelMapper = new ModelMapper();
-
-        modelMapper.createTypeMap(Board.class, BoardResponse.class)
-                .addMappings(mapping -> mapping
-                        .map(src -> src.getMember().getNickname(), BoardResponse::setNickname));
-
-        return boards.map(board -> modelMapper.map(board, BoardResponse.class));
+        return boards.map(board -> {
+            BoardResponse response = modelMapper.map(board, BoardResponse.class);
+            response.setNickname(board.getMember().getNickname());
+            return response;
+        });
     }
 
     @Override
@@ -98,16 +97,15 @@ public class BoardServiceImpl implements BoardService {
     public void updateBoard(int bId, BoardUpdate boardUpdate, Member member) {
         try {
             Board board = boardRepository.findById(bId)
-                    .orElseThrow(() -> new UsernameNotFoundException(""));
+                    .orElseThrow(() -> new UsernameNotFoundException("Member Not found"));
 
             if (board.getMember().getMId() != member.getMId())
-                throw new AccessDeniedException("");
+                throw new AccessDeniedException("No access permission");
 
-            Board result = Board.builder()
-                    .bId(board.getBId())
-                    .title(board.getTitle())
-                    .content(board.getContent())
+            Board result = board.toBuilder()
                     .updateAt(LocalDateTime.now())
+                    .content(boardUpdate.getContent())
+                    .title(boardUpdate.getTitle())
                     .build();
 
             boardRepository.save(result);
@@ -167,9 +165,9 @@ public class BoardServiceImpl implements BoardService {
         Page<Board> boards;
 
         if (keyword == null) {
-            boards = boardRepository.findAllByOrderByBIdDesc(pageable);
+            boards = boardRepository.findAllByOrderByCreateAtDesc(pageable);
         } else {
-            boards = boardRepository.findBoardByTitleOrContentContainingOrderByBIdDesc(keyword, null, pageable);
+            boards = boardRepository.findBoardByTitleOrContentContainingOrderByCreateAtDesc(keyword, keyword, pageable);
         }
         return toEntity(boards);
     }
