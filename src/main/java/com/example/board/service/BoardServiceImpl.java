@@ -13,11 +13,15 @@ import com.example.board.service.impl.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -50,17 +54,20 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponse getBoard(int bId) {
-        Board board = boardRepository.getById(bId);
+        Board board = boardRepository.findById(bId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
         return toEntity(board);
     }
 
     @Override
     @Transactional
     public void createBoard(BoardCreate create, Member member) {
+        log.info("Writer Email : {}", member.getEmail());
 
         try {
-            if (create.getTitle()!=null) {
-                throw new CustomException(ErrorCode.BAD_REQUEST);
+            if (create.getTitle() == null) {
+                throw new NullPointerException();
             }
 
             Board board = Board.builder()
@@ -72,31 +79,48 @@ public class BoardServiceImpl implements BoardService {
 
             boardRepository.save(board);
 
+        } catch (NullPointerException e) {
+
+            log.error(e.getMessage() + " : Get Title is Null");
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+
         } catch (Exception e) {
+
             log.error(e.getMessage());
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+
         }
 
     }
 
     @Override
     @Transactional
-    public void updateBoard(int bId, BoardUpdate boardUpdate, MemberResponse member) {
+    public void updateBoard(int bId, BoardUpdate boardUpdate, Member member) {
         try {
-                Board board = boardRepository.findById(bId)
-                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+            Board board = boardRepository.findById(bId)
+                    .orElseThrow(() -> new UsernameNotFoundException(""));
 
-                if (board.getMember().getMId() != member.getId())
-                    throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
+            if (board.getMember().getMId() != member.getMId())
+                throw new AccessDeniedException("");
 
-                Board result = Board.builder()
+            Board result = Board.builder()
                     .bId(board.getBId())
                     .title(board.getTitle())
                     .content(board.getContent())
                     .updateAt(LocalDateTime.now())
                     .build();
 
-                boardRepository.save(result);
+            boardRepository.save(result);
+
+        } catch (AccessDeniedException e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
+
+        } catch (UsernameNotFoundException e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
 
         } catch (Exception e) {
 
@@ -112,10 +136,20 @@ public class BoardServiceImpl implements BoardService {
         try {
 
             Board board = boardRepository.findById(bId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+                    .orElseThrow(() -> new NotFoundException("Member Not Found"));
 
             if (board.getMember().getMId() != member.getMId())
-                throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
+                throw new AccessDeniedException("No access permission");
+
+        } catch (NotFoundException e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND_BOARD);
+
+        } catch (AccessDeniedException e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
 
         } catch (Exception e) {
 
