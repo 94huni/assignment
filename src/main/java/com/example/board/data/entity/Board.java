@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Getter @Setter
@@ -28,7 +28,8 @@ public class Board {
     @DateTimeFormat(fallbackPatterns = "yyyy-MM-dd HH:ss:mm")
     private LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "m_id")
     private Member member;
 
 }
