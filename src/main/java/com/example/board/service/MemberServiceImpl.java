@@ -16,10 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Service("MemberService")
@@ -40,6 +43,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member principalMember(Principal principal) {
+        return memberRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+    }
+
+    @Override
     public String currentMember(String token) {
         return jwtProvider.getUsername(token);
     }
@@ -52,13 +61,22 @@ public class MemberServiceImpl implements MemberService {
                     UsernamePasswordAuthenticationToken(signIn.getEmail(), signIn.getPassword()));
 
             Member member = memberRepository.findByEmail(signIn.getEmail())
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+                    .orElseThrow(() -> new UsernameNotFoundException("Member Not Found"));
+
 
             return jwtProvider.createToken(signIn.getEmail(), member.getRole());
 
-        }catch (AuthenticationException e) {
+        } catch (UsernameNotFoundException e) {
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
+        } catch (AuthenticationException e) {
 
+            log.error(e.getMessage());
             throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
 
         }
     }
@@ -98,12 +116,16 @@ public class MemberServiceImpl implements MemberService {
                     .userName(memberSignUp.getUserName())
                     .phone(memberSignUp.getPhone())
                     .password(passwordEncoder.encode(memberSignUp.getPassword()))
-                    .role(Role.Member)
+                    .role(Role.MEMBER)
                     .createAt(LocalDateTime.now())
                     .build();
 
             memberRepository.save(member);
-        } catch (Exception e) {
+        }catch (CustomException e) {
+
+            log.error(e.getMessage());
+
+        }catch (Exception e) {
             log.error(e.getMessage());
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
