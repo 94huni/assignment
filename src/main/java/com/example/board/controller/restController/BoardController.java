@@ -11,9 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,11 +36,9 @@ public class BoardController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<String> createBoard(@RequestBody BoardCreate boardCreate, HttpServletRequest req) {
+    public ResponseEntity<String> createBoard(@RequestBody BoardCreate boardCreate, Principal principal) {
 
-        String token = (String) req.getAttribute("token");
-
-        Member member = memberService.findMember(token);
+        Member member = memberService.principalMember(principal);
 
         boardService.createBoard(boardCreate, member);
 
@@ -48,23 +48,20 @@ public class BoardController {
     @PutMapping("/update/{bId}")
     public ResponseEntity<String> updateBoard(@PathVariable int bId,
                                               @RequestBody BoardUpdate update,
-                                              HttpServletRequest req) {
-        String token = (String) req.getAttribute("token");
+                                              Principal principal) {
 
-        Member member = memberService.findMember(token);
+        Member member = memberService.principalMember(principal);
 
-        MemberResponse res = memberService.getMember(member.getEmail());
-
-        boardService.updateBoard(bId, update, res);
+        boardService.updateBoard(bId, update, member);
 
         return ResponseEntity.ok("Update Successful");
     }
 
     @DeleteMapping("/delete/{bId}")
     public ResponseEntity<String> deleteBoard(@PathVariable int bId,
-                                              HttpServletRequest req) {
-        String token = (String) req.getAttribute("token");
-        Member member = memberService.findMember(token);
+                                              Principal principal) {
+
+        Member member = memberService.principalMember(principal);
 
         boardService.deleteBoard(bId, member);
 
