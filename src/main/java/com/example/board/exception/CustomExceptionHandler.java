@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<?> customExceptionHandler(CustomException e) {
-        return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(e.getErrorCode().getMessage());
+    public ResponseEntity<ErrorResponse> customExceptionHandler(CustomException e) {
+        return ResponseEntity
+                .ok(new ErrorResponse(e.getErrorCode().getStatus().toString(),
+                        e.getErrorCode().getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
