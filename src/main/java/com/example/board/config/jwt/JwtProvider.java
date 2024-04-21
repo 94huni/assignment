@@ -9,6 +9,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,13 +24,14 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtProvider {
     private final AccountService accountService;
 
-    @Value("${secret-key}")
+    @Value("${spring.security.jwt.secret}")
     private String secretKey;
 
-    @Value("${expiration-hours}")
+    @Value("${spring.security.jwt.expiration}")
     private long validityInMilliseconds;
 
     @PostConstruct
@@ -45,15 +47,17 @@ public class JwtProvider {
         Date valid = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(valid)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJwt(token).getBody().getSubject();
+        log.info("Get User Name Token : " + token);
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
     public Authentication getAuthentication(String token) {
@@ -62,9 +66,10 @@ public class JwtProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
+
         String bearerToken = request.getHeader("Authorization");
 
-        if (bearerToken != null && bearerToken.startsWith("Bearer"))
+        if (bearerToken != null && bearerToken.startsWith("Bearer "))
             return bearerToken.substring(7);
 
         return null;
@@ -72,9 +77,11 @@ public class JwtProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJwt(token);
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            log.info("validate Token : " + token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+            log.error("Service Error : " + e.getMessage());
             throw new CustomException(ErrorCode.NOT_FORBIDDEN_MEMBER);
         }
     }
