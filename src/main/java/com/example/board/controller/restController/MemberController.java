@@ -30,7 +30,7 @@ public class MemberController {
         res.put("token", token);
         // 유저이름 + 닉네임 추가 필요
 
-        log.info("Member Token : {}", signIn.getEmail());
+        log.info("Member Token : {}", token);
 
         return ResponseEntity.ok(res);
     }
