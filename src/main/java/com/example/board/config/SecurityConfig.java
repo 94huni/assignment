@@ -49,7 +49,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         /*  */
                         "/api/v1/member/login",
                         "/api/v1/member/register",
-                        "/api/v1/board/list")
+                        "/api/v1/board/list",
+                        "/api/v1/board/detail/**",
+                        "/main",
+                        "/main.js",
+                        "/favicon.ico")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
