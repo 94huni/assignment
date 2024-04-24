@@ -122,6 +122,51 @@ $(document).ready(function () {
 
     })
 
+    $(document).on('click', `#writeButton`, function () {
+        const title = $('#title').val();
+        const content = $('#content').val();
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        if (title.trim() === '') {
+            alert("title not found");
+            return;
+        }
+
+        $.ajax({
+            url: "/api/v1/board/post",
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                title: title,
+                content: content
+            }),
+            success: function (data) {
+                const message = data.message;
+                console.log(typeof(data.message));
+                alert(message);
+                $(`#write`).remove()
+                loadBoardList(0);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        });
+    });
+
     function loadBoardList(pageNumber) {
         $.ajax({
             url: `/api/v1/board/list?page=${pageNumber}`,
