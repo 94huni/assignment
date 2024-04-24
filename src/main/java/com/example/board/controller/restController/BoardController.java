@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,13 +38,16 @@ public class BoardController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<String> createBoard(@RequestBody BoardCreate boardCreate, Principal principal) {
+    public ResponseEntity<Map<String, String>> createBoard(@RequestBody BoardCreate boardCreate, Principal principal) {
 
         Member member = memberService.principalMember(principal);
 
         boardService.createBoard(boardCreate, member);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Post creation was successful");
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "Post creation was successful");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PutMapping("/update/{bId}")
