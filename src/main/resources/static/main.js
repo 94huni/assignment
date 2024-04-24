@@ -24,6 +24,54 @@ $(document).ready(function () {
         $(`.login-page`).append(loginHtml);
     });
 
+    $(document).on('click', `#login-submit`, function () {
+
+        const email = $('#floatingInput').val();
+        const password = $('#floatingPassword').val();
+
+        console.log("email: " + email + "password : " + password)
+        $.ajax({
+            url: "/api/v1/member/login",
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                email: email,
+                password: password
+            }),
+            success: function (data){
+                const token = data.token;
+
+                const expiresDate = new Date();
+                expiresDate.setTime(expiresDate.getTime() + (60 * 60 * 1000)); // 1시간 후
+
+
+                const expires = `expires=${expiresDate.toUTCString()}`;
+
+                document.cookie = `token=${token}; expires=${expires}; path=/`;
+
+                console.log("token : ", token);
+
+                $(`#sign`).remove();
+
+                $(`.login-page`).remove();
+                const pageNum = getPageNumberFromCookie();
+                if (pageNum) {
+                    loadBoardList(pageNum);
+                } else {
+                    loadBoardList(0)
+                }
+
+
+            },
+            error: function (xhr, textStatus, errorThrown){
+                const errorResponse = xhr.responseJSON;
+                alert(errorResponse.code + " " + errorResponse.message);
+            }
+        });
+
+    });
+
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
