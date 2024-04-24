@@ -55,6 +55,7 @@ $(document).ready(function () {
                 $(`#sign`).remove();
 
                 $(`.login-page`).remove();
+
                 const pageNum = getPageNumberFromCookie();
                 if (pageNum) {
                     loadBoardList(pageNum);
@@ -97,6 +98,28 @@ $(document).ready(function () {
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
         loadBoardList(pageNumber);
+    })
+
+    $(document).on('click', `#writeForm`, function () {
+        $('#continueButton').hide();
+        $(`.card-body`).remove();
+        $(`.pageRequest`).remove();
+        const writeFormHtml = `
+            <div class="container" id="write" xmlns="http://www.w3.org/1999/html">
+                        <h1 class="mt-5">글 쓰기 페이지</h1>
+                        <hr>
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <input type="text" id="title"><br />
+                                <textarea type="text" id="content"></textarea>
+                            </div>
+                        </div>
+                        <a id="writeButton" class="btn btn-primary mt-3">글쓰기</a>
+            </div>
+        `;
+
+        $(`.card-container`).append(writeFormHtml);
+
     })
 
     function loadBoardList(pageNumber) {
