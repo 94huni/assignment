@@ -41,7 +41,13 @@ public class BoardServiceImpl implements BoardService {
 
         return boardResponse;
     }
-    
+
+    @Override
+    public Board findBoard(int bId) {
+        return boardRepository.findById(bId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+    }
+
     public Page<BoardResponse> toEntity(Page<Board> boards) {
         ModelMapper modelMapper = new ModelMapper();
         return boards.map(board -> {
