@@ -5,6 +5,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder(toBuilder = true)
@@ -31,5 +33,8 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "m_id")
     private Member member;
+
+    @OneToMany
+    private List<Comment> comments = new ArrayList<>();
 
 }

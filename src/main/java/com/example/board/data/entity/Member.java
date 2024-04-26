@@ -50,6 +50,9 @@ public class Member implements UserDetails {
     @OneToMany
     private List<Board> boardList;
 
+    @OneToMany
+    private List<Comment> comments = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
