@@ -13,6 +13,7 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "Email is duplicated"),
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Email is Not found"),
     NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "Board is Not found"),
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "Comment is Not found"),
     NOT_FORBIDDEN_MEMBER(HttpStatus.FORBIDDEN, "No access rights"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Please check your Email or Password"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR"),
