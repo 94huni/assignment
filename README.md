@@ -90,4 +90,50 @@
 - **응답**
   - Success Response Status Code: `204 No Content`
   - Response Format: JSON
+ 
+## 댓글 기능 설명
+
+### 댓글 작성
+- **요청**
+  - Request Method: `POST`
+  - URL: `/comment/write/board/{board_id}`
+- **응답**
+  - Success Response Status Code: `201 Create`
+  - Response Format: JSON
+
+### 개시글 댓글 정보 조회
+
+- **요청**
+  - Request Method: `GET`
+  - URL: `/comment/board/{b_id}?page={value}`
+- **응답**
+  - Success Response Status Code: `200 ok`
+  - Response Format: JSON
+
+### 현재접속된 유저 댓글 리스트 조회
+
+- **요청**
+  - Request Method: `GET`
+  - URL: `/comment/member?page={value}`
+- **응답**
+  - Success Response Status Code: `200 ok`
+  - Response Format: JSON
+
+### 댓글 수정
+
+- **요청**
+  - Request Method: `PUT`
+  - URL: `/comment/update/{comment_id}`
+- **응답**
+  - Success Response Status Code: `200 OK`
+  - Response Format: JSON
+
+ ### 댓글 삭제
+
+- **요청**
+  - Request Method: `DELETE`
+  - URL: `/comment/delete/{comment_id}`
+- **응답**
+  - Success Response Status Code: `204 No Content`
+  - Response Format: JSON
 
