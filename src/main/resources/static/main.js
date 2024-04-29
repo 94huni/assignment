@@ -2,6 +2,7 @@
 $(document).ready(function () {
     let pageNumber = 0;
 
+    // 로그인페이지
     $(document).on('click', `#login-request`, function () {
         $('#continueButton').hide();
         $(`.card-body`).remove();
@@ -24,6 +25,7 @@ $(document).ready(function () {
         $(`.login-page`).append(loginHtml);
     });
 
+    // 로그인 입력후 실행
     $(document).on('click', `#login-submit`, function () {
 
         const email = $('#floatingInput').val();
@@ -73,6 +75,8 @@ $(document).ready(function () {
 
     });
 
+
+    //다음페이지 버튼
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
@@ -81,6 +85,8 @@ $(document).ready(function () {
         loadBoardList(pageNumber);
     });
 
+
+    //뒤로가기 페이지 버튼
     $(document).on('click', '.page-back-button', function () {
         console.log("page back button : " + pageNumber)
         if (pageNumber > 0) {
@@ -93,13 +99,17 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', 'page-link', function () {
+
+    //페이지 이동 버튼
+    $(document).on('click', '.page-link', function () {
         pageNumber = parseInt($(this).attr('id'));
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
         loadBoardList(pageNumber);
     })
 
+
+    //글쓰기 페이지 호출
     $(document).on('click', `#writeForm`, function () {
         $('#continueButton').hide();
         $(`.card-body`).remove();
@@ -122,6 +132,7 @@ $(document).ready(function () {
 
     })
 
+    //글쓰기 폼
     $(document).on('click', `#writeButton`, function () {
         const title = $('#title').val();
         const content = $('#content').val();
@@ -237,6 +248,7 @@ $(document).ready(function () {
 
     $('#continueButton').click(loadBoardList(pageNumber));
 
+    //리스트로 돌아가기 버튼
     $(document).on('click', '#backButton', function (event) {
         event.preventDefault();
 
@@ -246,6 +258,8 @@ $(document).ready(function () {
 
     });
 
+
+    //상세페이지 버튼
     $(document).on('click', '.post-link', function (event) {
         event.preventDefault();
         const bId = $(this).closest('.card-body').find('.bid').text();
