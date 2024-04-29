@@ -279,12 +279,17 @@ $(document).ready(function () {
                         <hr>
                         <div class="card mt-4">
                             <div class="card-body">
+                                <input type="hidden" id="boardId" value="${bId}">
                                 <h5 class="card-title" id="postTitle">${board.title}</h5>
                                 <p class="card-text" id="postContent">${board.content}</p>
                                 <small class="text-body-secondary">${formattedDate}</small>
                             </div>
                         </div>
-                        <a id="backButton" class="btn btn-primary mt-3">목록으로</a>
+                        <a id="backButton" class="btn btn-primary mt-3">List</a>
+                        <a id="updateButton" class="btn btn-primary mt-3">Update</a>
+                        <a id="commentButton" class="btn btn-primary mt-3">Comment</a>
+                        <br />
+                        <div id="comment-box"></div>
                     </div>`;
                 $('.card-container').html(cardHtml);
                 $('.pageRequest').remove();
