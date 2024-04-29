@@ -74,8 +74,7 @@ $(document).ready(function () {
         });
 
     });
-
-
+    
     //다음페이지 버튼
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
@@ -84,7 +83,6 @@ $(document).ready(function () {
         console.log("pageContinue : " + pageNumber);
         loadBoardList(pageNumber);
     });
-
 
     //뒤로가기 페이지 버튼
     $(document).on('click', '.page-back-button', function () {
@@ -99,7 +97,6 @@ $(document).ready(function () {
         }
     });
 
-
     //페이지 이동 버튼
     $(document).on('click', '.page-link', function () {
         pageNumber = parseInt($(this).attr('id'));
@@ -107,7 +104,6 @@ $(document).ready(function () {
         $(`.pageRequest`).remove();
         loadBoardList(pageNumber);
     })
-
 
     //글쓰기 페이지 호출
     $(document).on('click', `#writeForm`, function () {
@@ -258,7 +254,6 @@ $(document).ready(function () {
 
     });
 
-
     //상세페이지 버튼
     $(document).on('click', '.post-link', function (event) {
         event.preventDefault();
@@ -300,7 +295,6 @@ $(document).ready(function () {
             }
         });
     });
-
 
     //댓글 보기 버튼
     $(document).on('click', '#commentButton', function () {
@@ -388,6 +382,7 @@ $(document).ready(function () {
         return 0;
     }
 
+    //쿠키 저장된 JWT 불러오기
     function getJWTFromCookie() {
         const cookies = document.cookie.split(';');
         for (const cookie of cookies) {
