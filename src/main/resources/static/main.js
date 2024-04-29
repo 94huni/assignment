@@ -301,6 +301,62 @@ $(document).ready(function () {
         });
     });
 
+
+    //댓글 보기 버튼
+    $(document).on('click', '#commentButton', function () {
+        const boardId = document.getElementById("boardId").value;
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        $.ajax({
+            url: `/api/v1/comment/board/${boardId}`,
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function (data) {
+                const comments = data.content;
+                console.log(comments);
+
+                let commentHtml =``;
+                for (const comment of comments) {
+                    const dateString = comment.createAt;
+                    const date = new Date(dateString);
+                    const formattedDate = date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+                    commentHtml += `
+                    <div id="comment_" style="position: relative">
+                        <span style="font-weight: bold">${comment.writer}</span>
+                        <input type="hidden" name="cno" value="${comment.cId}">   
+                        <button style="position:absolute; top:0px;right:10px;margin: 0 auto; padding: 2px;" type="submit">x</button>
+                        <small class="text-body-secondary">${formattedDate}</small>
+                        <p>
+                            <span style="font-size: 12px;">${comment.comment}</span>
+                        </p>
+                        <br>
+                    </div>
+                `;
+                }
+                $('#comment-box').html(commentHtml);
+                $('#commentButton').remove();
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        })
+
+    })
+
     function savePageNumberToCookie(pageNumber) {
 
         const existingPageNumber = getPageNumberFromCookie();
