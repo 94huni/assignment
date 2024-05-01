@@ -34,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
     private final AuthenticationManager manager;
     private final JwtProvider jwtProvider;
 
+    // 토큰으로 받아왔을때 사용
     @Override
     public Member findMember(String token) {
         String email = jwtProvider.getUsername(token);
@@ -42,17 +43,20 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
+    // 현재 접속된 유저 반환
     @Override
     public Member principalMember(Principal principal) {
         return memberRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
+    // 토큰으로 현재 접속된 email 반환
     @Override
     public String currentMember(String token) {
         return jwtProvider.getUsername(token);
     }
 
+    // 로그인
     @Override
     public String signIn(SignIn signIn) {
         try {
@@ -81,6 +85,7 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    // 유저에게 보여주기위한 정보 반환
     @Override
     public MemberResponse getMember(String email) {
         Member member = memberRepository.findByEmail(email)
@@ -97,6 +102,7 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    // 회원가입
     @Override
     @Transactional
     public void signUpMember(MemberSignUp memberSignUp) {
@@ -133,16 +139,19 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
+    // 닉네임 중복확인
     @Override
     public boolean validNickname(String nickname) {
         return memberRepository.existsByNickname(nickname);
     }
 
+    // 이메일 중복확인
     @Override
     public boolean validEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
 
+    // 회원정보 수정
     @Override
     @Transactional
     public void updateMember(MemberUpdate memberUpdate, Member member) {

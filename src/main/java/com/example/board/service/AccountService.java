@@ -15,10 +15,11 @@ public class AccountService implements UserDetailsService{
 
     private final MemberRepository memberRepository;
 
+    // UserDetailsService 구현
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER)); // Email 이 없을시 NOT FOUND
     }
 
 }

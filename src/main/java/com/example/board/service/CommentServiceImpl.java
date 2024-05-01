@@ -43,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
         });
     }
 
+    // 댓글 생성
     @Override
     public void createComment(CommentWrite create, Member member, Board board) {
         if (create == null)
@@ -81,6 +82,7 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    // 게시글에 등록된 모든 댓글 조회
     @Override
     public Page<CommentResponse> getCommentsByBoard(int b_id, int page) {
 
@@ -97,6 +99,7 @@ public class CommentServiceImpl implements CommentService {
         return toEntity(comments);
     }
 
+    // 해당 email 의 유저가 등록한 모든댓글 조회
     @Override
     public Page<CommentResponse> getCommentsByMember(String email, int page) {
 
@@ -110,6 +113,7 @@ public class CommentServiceImpl implements CommentService {
         return toEntity(comments);
     }
 
+    // 댓글수정
     @Override
     public void updateComment(int cId, CommentWrite create, Member member) {
         try {
@@ -149,6 +153,7 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    // 댓글 삭제
     @Override
     public void deleteComment(int cId, Member member) {
         try {
