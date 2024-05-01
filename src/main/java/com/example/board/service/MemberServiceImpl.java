@@ -139,18 +139,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean validPassword(String password, String validPassword) {
-        return password.equals(validPassword);
-    }
-
-    @Override
     public boolean validEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
 
     @Override
     @Transactional
-    public void updateMember(MemberUpdate memberUpdate, String token) {
+    public void updateMember(MemberUpdate memberUpdate, Member member) {
         try {
             if (!memberUpdate.getPassword().equals(memberUpdate.getValidPassword()))
                 throw new CustomException(ErrorCode.DIFFERENT_PASSWORD);
@@ -158,14 +153,14 @@ public class MemberServiceImpl implements MemberService {
             if(memberRepository.existsByNickname(memberUpdate.getNickname()))
                 throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
 
-            MemberResponse member = getMember(jwtProvider.getUsername(token));
 
-            Member result = Member.builder()
-                    .mId(member.getId())
+            Member result = member.toBuilder()
+                    .mId(member.getMId())
                     .nickname(memberUpdate.getNickname())
                     .password(passwordEncoder.encode(memberUpdate.getPassword()))
                     .updateAt(LocalDateTime.now())
                     .build();
+
 
             memberRepository.save(result);
         } catch (Exception e) {

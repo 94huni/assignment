@@ -24,9 +24,7 @@ public interface MemberService {
 
     boolean validNickname(String nickname);
 
-    boolean validPassword(String password, String validPassword);
-
     boolean validEmail(String email);
 
-    void updateMember(MemberUpdate memberUpdate, String token);
+    void updateMember(MemberUpdate memberUpdate, Member member);
 }

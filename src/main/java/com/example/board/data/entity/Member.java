@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity(name = "Member")
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
