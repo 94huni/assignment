@@ -91,6 +91,9 @@ public class CommentServiceImpl implements CommentService {
 
         Page<Comment> comments = commentRepository.findCommentByBoardOrderByCreateAtDesc(board, pageable);
 
+        if (comments.getTotalPages() <= page || comments.getTotalPages() < 0)
+            throw new CustomException(ErrorCode.BAD_REQUEST_PAGE);
+
         return toEntity(comments);
     }
 
