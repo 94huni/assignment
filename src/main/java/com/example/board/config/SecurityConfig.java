@@ -51,6 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/v1/member/register",
                         "/api/v1/board/list",
                         "/api/v1/board/detail/**",
+                        "/api/v1/member/validEmail",
+                        "/api/v1/member/validNickname",
                         "/main",
                         "/main.js",
                         "/favicon.ico")
