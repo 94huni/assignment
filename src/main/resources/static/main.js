@@ -1,15 +1,18 @@
 // GET /api/v1/board/list
 $(document).ready(function () {
+    $('#writeForm').hide();
     let pageNumber = 0;
 
     // 로그인페이지
     $(document).on('click', `#login-request`, function () {
         $('#continueButton').hide();
-        $(`.card-body`).remove();
-        $(`.pageRequest`).remove();
+        $(`#login-request`).hide();
+        $('#signUp-form').remove();
+        $(`#signUp-button`).show();
+        deleteDiv();
         const loginHtml = `
-            
-                <div class="form-floating">
+            <div id="login-request-div">
+                <div class="form-floating" >
                     <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
                     <label for="floatingInput">Email address</label>
                 </div>
@@ -19,7 +22,7 @@ $(document).ready(function () {
                 </div>
                 <button class="btn btn-primary w-100 py-2" id="login-submit">Sign in</button>
                 <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
-          
+          </div>
         `;
         console.log(loginHtml);
         $(`.login-page`).append(loginHtml);
@@ -64,6 +67,8 @@ $(document).ready(function () {
                 } else {
                     loadBoardList(0)
                 }
+
+                $(`#writeForm`).show();
 
 
             },
@@ -162,6 +167,7 @@ $(document).ready(function () {
                 alert(message);
                 $(`#write`).remove()
                 loadBoardList(0);
+                $(`#writeForm`).show();
             },
             error: function (xhr, textStatus, errorThrown){
                 if (xhr.responseJSON) {
