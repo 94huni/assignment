@@ -312,6 +312,44 @@ $(document).ready(function () {
             return;
         }
 
+
+    //댓글 다음페이지
+    $(document).on('click', '#continueComment', function (event) {
+        event.preventDefault();
+        const pageNumber = document.getElementById("currentPage").value;
+        const boardId = document.getElementById("boardId").value;
+
+        const nextPage = parseInt(pageNumber) + 1;
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        loadComment(nextPage, boardId, token);
+    })
+
+    //댓글 이전페이지
+    $(document).on('click', '#backComment', function (event) {
+        event.preventDefault();
+        const pageNumber = document.getElementById("currentPage").value;
+        const boardId = document.getElementById("boardId").value;
+
+        const backPage = parseInt(pageNumber) - 1;
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        loadComment(backPage, boardId, token);
+
+    })
+
         $.ajax({
             url: `/api/v1/comment/board/${boardId}`,
             type: 'GET',
