@@ -17,7 +17,8 @@ public enum ErrorCode {
     NOT_FORBIDDEN_MEMBER(HttpStatus.FORBIDDEN, "No access rights"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Please check your Email or Password"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR"),
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad Request");
+    BAD_REQUEST_TITLE(HttpStatus.BAD_REQUEST, "Title is Null"),
+    BAD_REQUEST_PAGE(HttpStatus.BAD_REQUEST, "First or Final Page");
 
 
     private final HttpStatus status;
