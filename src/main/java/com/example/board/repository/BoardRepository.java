@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Integer> {
     Page<Board> findAllByOrderByCreateAtDesc(Pageable pageable);
-    Page<Board> findBoardByTitleOrContentContainingOrderByCreateAtDesc(String titleKeyword, String contentKeyword, Pageable pageable);
+
+    Page<Board> findBoardByTitleContainingOrderByCreateAtDesc(String titleKeyword, Pageable pageable);
+
 
 }
