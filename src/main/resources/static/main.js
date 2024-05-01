@@ -128,33 +128,147 @@ $(document).ready(function () {
         $('#signUp-button').hide();
     });
 
+    //회원가입 POST 요청
+    $(document).on('click', '#signUp-submit', function () {
+        const username = $('#userName').val();
+        const password = $('#password').val();
+        const validPassword = $('#validPassword').val();
+        const nickname = $('#nickName').val();
+        const email = $('#email').val();
+        const phone = $('#phone').val();
+
+        $.ajax({
+            url: "/api/v1/member/register",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                userName: username,
+                email: email,
+                password: password,
+                validPassword: validPassword,
+                nickName: nickname,
+                phone: phone
+            }),
+            success: function (data) {
+                alert(data.message);
+                $('#signUp-form').remove();
+                loadBoardList(0);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON){
+                    const errorResponse = xhr.responseJSON;
+                    console.log(errorResponse);
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert(textStatus+ " " + errorThrown);
+                }
+            }
+        });
+    });
+
+    $(document).on('input', '#validPassword', function() {
+        const password = $('#password').val();
+        const validPassword = $(this).val();
+
+        if (password === validPassword) {
+            $('#passwordMatch').html('<span style="color:green;">Passwords match</span>');
+            $('#password').prop('disabled', true);
+            $('#validPassword').prop('disabled', true);
+        } else {
+            $('#passwordMatch').html('<span style="color:red;">Passwords do not match</span>');
+        }
+    });
+
+    $(document).on('click', '#checkEmail', function() {
+        const email = $('#email').val(); // 아이디 입력값 가져오기
+
+        $.ajax({
+            url: '/api/v1/member/validEmail',
+            type: 'POST',
+            data: { email: email },
+            success: function(response) {
+                if (response === 1) {
+                    alert('Email available'); // 사용 가능한 아이디인 경우
+                    $('#email').prop('disabled', true);
+                    $('#checkEmail').prop('disabled', true);
+                } else {
+                    alert('Email not available'); // 사용 중인 아이디인 경우
+                    $('#email').val(''); // 아이디 입력 필드 초기화
+                }
+            },
+            error: function(xhr) {
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                } // 오류가 발생한 경우
+            }
+        });
+    });
+
+    $(document).on('click', '#checkNickname', function() {
+        const nickname = $('#nickName').val(); // 아이디 입력값 가져오기
+
+        $.ajax({
+            url: '/api/v1/member/validNickname',
+            type: 'POST',
+            data: { nickname: nickname },
+            success: function(response) {
+                if (response === 1) {
+                    alert('Nickname available'); // 사용 가능한 아이디인 경우
+                    $('#nickName').prop('disabled', true);
+                    $('#checkNickname').prop('disabled', true);
+                } else {
+                    alert('Nickname not available'); // 사용 중인 아이디인 경우
+                    $('#nickName').val(''); // 아이디 입력 필드 초기화
+                }
+            },
+            error: function(xhr) {
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                } // 오류가 발생한 경우
+            }
+        });
+    });
+
+    //마지막 페이지 버튼
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
-        pageNumber ++
-        console.log("pageContinue : " + pageNumber);
-        loadBoardList(pageNumber);
+        const totalPages = $(this).data('total-pages');
+        const keywordElement = document.getElementById('keyword');
+        const keyword = keywordElement ? keywordElement.value : null;
+
+        console.log("pageContinue : " + totalPages);
+        const result = parseInt(totalPages);
+        loadBoardList(result - 1, keyword);
     });
 
     //뒤로가기 페이지 버튼
     $(document).on('click', '.page-back-button', function () {
         console.log("page back button : " + pageNumber)
-        if (pageNumber > 0) {
-            $(`.card-body`).remove();
-            $(`.pageRequest`).remove();
-            pageNumber--;
-            loadBoardList(pageNumber);
-        } else {
-            alert("First Page");
-        }
+        const keywordElement = document.getElementById('keyword');
+        const keyword = keywordElement ? keywordElement.value : null;
+
+        $(`.card-body`).remove();
+        $(`.pageRequest`).remove();
+        loadBoardList(0, keyword);
     });
 
     //페이지 이동 버튼
-    $(document).on('click', '.page-link', function () {
+    $(document).on('click', '.page-select', function () {
         pageNumber = parseInt($(this).attr('id'));
+        const keywordElement = document.getElementById('keyword');
+        const keyword = keywordElement ? keywordElement.value : null;
+
+        console.log("page link page : " + pageNumber)
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
-        loadBoardList(pageNumber);
+        loadBoardList(pageNumber, keyword);
     })
 
     //글쓰기 페이지 호출
@@ -162,6 +276,8 @@ $(document).ready(function () {
         $('#continueButton').hide();
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
+        $(`#login-request`).remove();
+        $(`#writeForm`).hide();
         const writeFormHtml = `
             <div class="container" id="write" xmlns="http://www.w3.org/1999/html">
                         <h1 class="mt-5">글 쓰기 페이지</h1>
@@ -180,7 +296,7 @@ $(document).ready(function () {
 
     })
 
-    //글쓰기 폼
+    //글쓰기 POST 요청
     $(document).on('click', `#writeButton`, function () {
         const title = $('#title').val();
         const content = $('#content').val();
@@ -227,14 +343,25 @@ $(document).ready(function () {
         });
     });
 
-    function loadBoardList(pageNumber) {
+    $(document).on('click', '#searchSubmit', function () {
+        const keyword = document.getElementById('searchInput').value;
+        deleteDiv();
+        loadBoardList(0, keyword);
+    });
+    //리스트 페이지 불러오기
+    function loadBoardList(pageNumber, keyword) {
         $.ajax({
-            url: `/api/v1/board/list?page=${pageNumber}`,
+            url: `/api/v1/board/list`,
             type: "GET",
             dataType: 'json',
+            data: {
+                page: pageNumber,
+                keyword: keyword
+            },
             success: function (response) {
                 const board = response.content;
                 console.log(response.content);
+                console.log(response.totalPages);
 
                 let cardHtml;
                 for (const result of board) {
@@ -247,7 +374,6 @@ $(document).ready(function () {
                             { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
                     const bId = result.bid;
-                    console.log(bId);
                     cardHtml = `
                         <div class="card-body">
                             <p class="bid">${bId}</p>
@@ -265,32 +391,71 @@ $(document).ready(function () {
 
                     $('#continueButton').hide();
                 }
-                const pageHtml = `
-                    <nav aria-label="Page navigation" class="pageRequest">
-                            <ul class="pagination">
+                let pageHtml = `
+                                <nav aria-label="Page navigation" class="pageRequest">
+                                    <ul class="pagination">
+                                `;
+
+                if (pageNumber === 0) {
+                    pageHtml += `
+                              
+                                <li class="page-item"><a class="page-link page-select bg-primary text-white" href="#" id="0">1</a></li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="1">2</a></li>
+                                <li class="page-item">
+                                    <a class="page-link last-page" href="#" id="pageContinueButton" aria-label="Next" data-total-pages="${response.totalPages}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                    </a>
+                                </li>
+                                `;
+                } else if (pageNumber === response.totalPages - 1) { // 현재 페이지가 마지막 페이지인 경우
+                    pageHtml += `
                                 <li class="page-item">
                                     <a class="page-link page-back-button" href="#" id="pageBackButton" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Previous</span>
+                                    <span class="sr-only">First</span>
                                     </a>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#" id="${pageNumber}">${pageNumber + 1}</a></li>
-                            <li class="page-item"><a class="page-link" href="#" id="${pageNumber+1}">${pageNumber + 2}</a></li>
-                            <li class="page-item"><a class="page-link" href="#" id="${pageNumber+2}">...</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#" id="pageContinueButton" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Next</span>
-                                </a>
                                 </li>
-                            </ul>
-                        </nav>`;
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNumber - 2}">${pageNumber - 1}</a></li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNumber - 1}">${pageNumber}</a></li>
+                                <li class="page-item"><a class="page-link page-select bg-primary text-white" href="#" id="${pageNumber}">${pageNumber + 1}</a></li>
+                                `;
+                } else { // 그 외의 경우
+                    pageHtml += `
+                                <li class="page-item">
+                                    <a class="page-link page-back-button" href="#" id="pageBackButton" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                    </a>
+                                </li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNumber - 1}">${pageNumber}</a></li>
+                                <li class="page-item"><a class="page-link page-select bg-primary text-white" href="#" id="${pageNumber}">${pageNumber + 1}</a></li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNumber + 1}">${pageNumber + 2}</a></li>
+                                <li class="page-item">
+                                    <a class="page-link last-page" href="#" id="pageContinueButton" aria-label="Next" data-total-pages="${response.totalPages}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                    </a>
+                                </li>
+                                `;
+                }
+
+                pageHtml += `
+                                </ul>
+                            </nav>
+                            <input type="hidden" id="keyword" value="${keyword}">`;
+
                 $('.pageContainer').append(pageHtml);
             },
             error: function (xhr, status, error) {
 
-                alert(status + error);
-                console.error('Error:', error);
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                    location.reload();
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
             }
         });
     }
@@ -359,6 +524,8 @@ $(document).ready(function () {
             return;
         }
 
+        loadComment(0, boardId, token);
+    })
 
     //댓글 다음페이지
     $(document).on('click', '#continueComment', function (event) {
@@ -397,8 +564,9 @@ $(document).ready(function () {
 
     })
 
+    function loadComment(commentPageNum, bId, token) {
         $.ajax({
-            url: `/api/v1/comment/board/${boardId}`,
+            url: `/api/v1/comment/board/${bId}?page=${commentPageNum}`,
             type: 'GET',
             dataType: 'json',
             headers: {
@@ -426,9 +594,17 @@ $(document).ready(function () {
                         <br>
                     </div>
                 `;
+
                 }
+
+                commentHtml += `<a id="continueComment" class="btn btn-primary mt-3">Continue</a>
+
+                                <a id="backComment" class="btn btn-primary mt-3">Back</a>
+                                <input type="hidden" id="currentPage" value="${commentPageNum}">`;
+
                 $('#comment-box').html(commentHtml);
                 $('#commentButton').remove();
+                console.log(commentPageNum)
             },
             error: function (xhr, textStatus, errorThrown){
                 if (xhr.responseJSON) {
@@ -439,8 +615,7 @@ $(document).ready(function () {
                 }
             }
         })
-
-    })
+    }
 
     function savePageNumberToCookie(pageNumber) {
 
@@ -483,6 +658,12 @@ $(document).ready(function () {
             }
         }
         return null;
+    }
+
+    function deleteDiv() {
+        $(`.card-body`).remove();
+        $(`.pageRequest`).remove();
+        $(`#comment_`).remove();
     }
 
 });
