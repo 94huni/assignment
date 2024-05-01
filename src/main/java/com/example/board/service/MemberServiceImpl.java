@@ -124,6 +124,7 @@ public class MemberServiceImpl implements MemberService {
         }catch (CustomException e) {
 
             log.error(e.getMessage());
+            throw new CustomException(e.getErrorCode());
 
         }catch (Exception e) {
             log.error(e.getMessage());
