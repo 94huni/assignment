@@ -36,12 +36,14 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> memberSignUp(@Valid @RequestBody MemberSignUp memberSignUp) {
+    public ResponseEntity<Map<String, String>> memberSignUp(@Valid @RequestBody MemberSignUp memberSignUp) {
         memberService.signUpMember(memberSignUp);
 
         log.info("MemberEmail : {}", memberSignUp.getEmail());
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "Membership registration completed");
 
-        return ResponseEntity.ok("Membership registration completed");
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/update")
@@ -60,21 +62,21 @@ public class MemberController {
     }
 
     @Hidden
-    @GetMapping("/validNickname")
+    @PostMapping("/validNickname")
     public int validNickname(String nickname) {
         if (memberService.validNickname(nickname))
-            return 1;
-        else
             return 0;
+        else
+            return 1;
     }
 
     @Hidden
-    @GetMapping("/validEmail")
+    @PostMapping("/validEmail")
     public int validEmail(String email) {
         if (memberService.validEmail(email))
-            return 1;
-        else
             return 0;
+        else
+            return 1;
     }
 
     @Hidden
