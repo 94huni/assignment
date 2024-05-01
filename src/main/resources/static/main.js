@@ -79,8 +79,55 @@ $(document).ready(function () {
         });
 
     });
-    
-    //다음페이지 버튼
+
+    //회원가입 버튼
+    $(document).on('click', `#signUp-button`, function () {
+        $(`.card-body`).remove();
+        $(`.pageRequest`).remove();
+        $('#login-request-div').remove();
+        $(`#comment_`).remove();
+        $('#details').remove();
+        $('#write').remove();
+        $(`#login-request`).show();
+        const signUpHtml = `
+        <div class="container mt-5" id="signUp-form">
+        <h2>Member SignUp Form</h2>
+            <hr>
+            <div class="mb-3">
+                <label for="userName" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="userName" placeholder="Enter user name" required>
+            </div>
+            <div class="mb-3">
+                <label for="nickName" class="form-label">Nick Name</label>
+                <input type="text" class="form-control" id="nickName" placeholder="Enter nick name" required>
+                <button type="submit" id="checkNickname">Check</button>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+            </div>
+            <div class="mb-3">
+                <label for="validPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="validPassword" placeholder="Enter password again" required>
+                <span id="passwordMatch" style="color:#ff0000;">Passwords do not match</span>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="phone" placeholder="Enter phone number" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter email" required>
+                <button type="submit" id="checkEmail">Check</button>
+            </div>
+            <button type="submit" class="btn btn-primary" id="signUp-submit">Submit</button>
+        </div>
+        `;
+
+        $('.signUp-page').append(signUpHtml);
+        $('#signUp-button').hide();
+    });
+
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
