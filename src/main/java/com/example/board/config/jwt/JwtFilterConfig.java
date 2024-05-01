@@ -13,6 +13,8 @@ public class JwtFilterConfig extends SecurityConfigurerAdapter<DefaultSecurityFi
     @Override
     public void configure(HttpSecurity builder) throws Exception {
         JwtTokenFilter filter = new JwtTokenFilter(jwtProvider);
+
+        //UsernamePasswordAuthenticationFilter 실행전 가로채서 JwtTokenFilter 를 먼저 실행시킴
         builder.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 }

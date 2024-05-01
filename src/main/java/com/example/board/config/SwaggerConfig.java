@@ -14,6 +14,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI(){
         SecurityScheme securityScheme = new SecurityScheme()
+                // 시큐리티 사용을 위한 스킴과 이름설정
                 .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER).name("Authorization");
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");

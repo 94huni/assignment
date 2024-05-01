@@ -31,9 +31,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.apply(new JwtFilterConfig(jwtProvider));
+        http.csrf().disable(); // csrf 해제
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션을 사용하지 않음
+        http.apply(new JwtFilterConfig(jwtProvider)); // 필터 사용을 알림
+        
         http.authorizeRequests()
                 .antMatchers(/* swagger v2 */
                         "/v2/api-docs",
@@ -46,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         /* swagger v3 */
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
-                        /*  */
+                        /* 권한없이 사용가능한 url */
                         "/api/v1/member/login",
                         "/api/v1/member/register",
                         "/api/v1/board/list",
@@ -56,11 +57,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/main",
                         "/main.js",
                         "/favicon.ico")
-                .permitAll()
-                .anyRequest().authenticated()
+                .permitAll() // 권한 없어도 접속가능
+                .anyRequest().authenticated() // 나머지 url 은 검증된 사용자만 가능
                 .and()
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authenticationProvider(authenticationProvider());
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class) // jwtTokenFilter 를 UsernamePasswordAuthenticationFilter 사용전에 사용
+                .authenticationProvider(authenticationProvider()); //빈으로 등록해둔 provider
 
     }
 
@@ -75,8 +76,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        //커스텀된 유저디테일스서비스를 등록
         authenticationProvider.setUserDetailsService(accountService);
+        
+        //빈으로 등록된 패스워드인코더 등록
         authenticationProvider.setPasswordEncoder(passwordEncoder());
+        
         return authenticationProvider;
     }
 
@@ -88,10 +93,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // AuthenticationManagerBuilder 에 커스텀된 userDetailsService 와 패스워드 인코더 저장
         auth.userDetailsService(accountService).passwordEncoder(passwordEncoder());
     }
 
-    @Bean
+    @Bean // 사용된 패스워드 인코더
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

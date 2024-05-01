@@ -27,6 +27,7 @@ public class CommentController {
     private final MemberService memberService;
     private final BoardService boardService;
 
+    // 게시글에 댓글 생성
     @PostMapping("/write/board/{bId}")
     public ResponseEntity<Map<String, String>> writeComment(@RequestBody CommentWrite commentWrite,
                                                             Principal principal,
@@ -41,6 +42,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(map);
     }
 
+    // 현재 접속된 회원의 댓글정보
     @GetMapping("/member")
     public ResponseEntity<Page<CommentResponse>> getCommentByMember(Principal principal,
                                                                     @RequestParam int page) {
@@ -50,13 +52,16 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsByMember(member.getEmail(), page));
     }
 
+    
+    // 게시글에 등록된 댓글 전체 조회
     @GetMapping("/board/{bId}")
     public ResponseEntity<Page<CommentResponse>> getCommentByBoard(@PathVariable int bId,
-                                                                   @RequestParam int page) {
+                                                                   @RequestParam(required = false, defaultValue = "0") int page) {
 
         return ResponseEntity.ok(commentService.getCommentsByBoard(bId, page));
     }
 
+    // 해당 댓글의 수정
     @PutMapping("/update/{cId}")
     public ResponseEntity<Map<String, String>> updateComment(@PathVariable int cId,
                                                              @RequestBody CommentWrite write,
@@ -71,6 +76,7 @@ public class CommentController {
         return ResponseEntity.ok(result);
     }
 
+    // 해당댓글의 삭제
     @DeleteMapping("/delete/{cId}")
     public ResponseEntity<Map<String, String>> deleteComment(@PathVariable int cId,
                                                              Principal principal) {
