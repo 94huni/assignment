@@ -5,7 +5,6 @@ import com.example.board.data.entity.Member;
 import com.example.board.data.requestDto.BoardCreate;
 import com.example.board.data.requestDto.BoardUpdate;
 import com.example.board.data.responseDto.BoardResponse;
-import com.example.board.data.responseDto.MemberResponse;
 import com.example.board.exception.CustomException;
 import com.example.board.exception.ErrorCode;
 import com.example.board.repository.BoardRepository;
@@ -13,7 +12,6 @@ import com.example.board.service.impl.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -87,7 +85,7 @@ public class BoardServiceImpl implements BoardService {
         } catch (NullPointerException e) {
 
             log.error(e.getMessage() + " : Get Title is Null");
-            throw new CustomException(ErrorCode.BAD_REQUEST);
+            throw new CustomException(ErrorCode.BAD_REQUEST_TITLE);
 
         } catch (Exception e) {
 
@@ -173,8 +171,12 @@ public class BoardServiceImpl implements BoardService {
         if (keyword == null) {
             boards = boardRepository.findAllByOrderByCreateAtDesc(pageable);
         } else {
-            boards = boardRepository.findBoardByTitleOrContentContainingOrderByCreateAtDesc(keyword, keyword, pageable);
+            boards = boardRepository.findBoardByTitleContainingOrderByCreateAtDesc(keyword, pageable);
         }
+
+        if (boards.getTotalPages() <= page || boards.getTotalPages() < 0)
+            throw new CustomException(ErrorCode.BAD_REQUEST_PAGE);
+
         return toEntity(boards);
     }
 }
