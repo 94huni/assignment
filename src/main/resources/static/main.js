@@ -507,12 +507,15 @@ $(document).ready(function () {
                         </div>
                         <a id="backButton" class="btn btn-primary mt-3">List</a>
                         <a id="updateButton" class="btn btn-primary mt-3">Update</a>
-                        <a id="commentButton" class="btn btn-primary mt-3">Comment</a>
+                        <a id="commentButton" class="btn btn-primary mt-3">Comment List</a>
+                        <a id="commentWriteButton" class="btn btn-primary mt-3">Comment Write</a>
                         <br />
+                        <div id="comment-write-box"></div>
                         <div id="comment-box"></div>
                     </div>`;
                 $('.card-container').html(cardHtml);
                 $('.pageRequest').remove();
+
             },
             error: function (xhr, status, error) {
                 alert(status + error);
