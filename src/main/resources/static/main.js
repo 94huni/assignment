@@ -7,6 +7,7 @@ $(document).ready(function () {
     $(document).on('click', `#login-request`, function () {
         // 쓰지않는 페이지들 보이지 않게
         $('#continueButton').hide();
+        $(`#details`).remove();
         $(`#login-request`).hide();
         $('#signUp-form').remove();
         $(`#signUp-button`).show(); // 로그인 페이지에선 회원가입 버튼이 보이게
@@ -280,6 +281,7 @@ $(document).ready(function () {
         $('#continueButton').hide();
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
+        $(`#details`).remove();
         $(`#login-request`).remove();
         $(`#writeForm`).hide();
         const writeFormHtml = `
