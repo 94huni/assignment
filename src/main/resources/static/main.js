@@ -5,10 +5,11 @@ $(document).ready(function () {
 
     // 로그인페이지
     $(document).on('click', `#login-request`, function () {
+        // 쓰지않는 페이지들 보이지 않게
         $('#continueButton').hide();
         $(`#login-request`).hide();
         $('#signUp-form').remove();
-        $(`#signUp-button`).show();
+        $(`#signUp-button`).show(); // 로그인 페이지에선 회원가입 버튼이 보이게
         deleteDiv();
         const loginHtml = `
             <div id="login-request-div">
@@ -25,7 +26,7 @@ $(document).ready(function () {
           </div>
         `;
         console.log(loginHtml);
-        $(`.login-page`).append(loginHtml);
+        $(`.login-page`).append(loginHtml); // 먼저 main.html 에 만들어둔 login-page class 에 현재 만든 html 생성
     });
 
     // 로그인 입력후 실행
@@ -166,6 +167,7 @@ $(document).ready(function () {
         });
     });
 
+    // 비밀번호 검증시 같은값이 입력되면 Input 태그 잠구는 기능
     $(document).on('input', '#validPassword', function() {
         const password = $('#password').val();
         const validPassword = $(this).val();
@@ -179,6 +181,7 @@ $(document).ready(function () {
         }
     });
 
+    // 이메일 중복확인시 사용할 수 있으면 태그 잠구는 기능
     $(document).on('click', '#checkEmail', function() {
         const email = $('#email').val(); // 아이디 입력값 가져오기
 
@@ -207,6 +210,7 @@ $(document).ready(function () {
         });
     });
 
+    // 닉네임 중복확인시 사용할 수 있으면 태그 잠구는 기능
     $(document).on('click', '#checkNickname', function() {
         const nickname = $('#nickName').val(); // 아이디 입력값 가져오기
 
@@ -460,6 +464,7 @@ $(document).ready(function () {
         });
     }
 
+    // $(document).on('click', '#continueButton', loadBoardList(pageNumber))
     $('#continueButton').click(loadBoardList(pageNumber));
 
     //리스트로 돌아가기 버튼
@@ -564,6 +569,7 @@ $(document).ready(function () {
 
     })
 
+    // 댓글 HTML 불러오는 기능
     function loadComment(commentPageNum, bId, token) {
         $.ajax({
             url: `/api/v1/comment/board/${bId}?page=${commentPageNum}`,
@@ -617,6 +623,7 @@ $(document).ready(function () {
         })
     }
 
+    // 게시판 페이지 넘버 쿠키에 저장하는 기능
     function savePageNumberToCookie(pageNumber) {
 
         const existingPageNumber = getPageNumberFromCookie();
@@ -637,6 +644,7 @@ $(document).ready(function () {
         }
     }
 
+    // 쿠키에저장된 페이지 넘버 받아오는 기능
     function getPageNumberFromCookie() {
         const cookies = document.cookie.split(';');
         for (const cookie of cookies) {
@@ -660,6 +668,7 @@ $(document).ready(function () {
         return null;
     }
 
+    // HTML 삭제
     function deleteDiv() {
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
