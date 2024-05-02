@@ -524,6 +524,21 @@ $(document).ready(function () {
         });
     });
 
+    $(document).on('click', '#commentWriteButton', function () {
+        $(`#commentWriteButton`).hide();
+
+        const commentInput = `
+        <div class="commentWriteInput">
+        <input type="text" id="commentInput" placeholder="comment write .."/>
+        <button type="button" id="commentWriteSubmit">Write</button>
+        <button type="button" id="commentWriteCancel">Cancel</button>
+        </div>
+        `;
+
+        $('#comment-write-box').html(commentInput);
+
+    });
+
     //댓글 보기 버튼
     $(document).on('click', '#commentButton', function () {
         const boardId = document.getElementById("boardId").value;
