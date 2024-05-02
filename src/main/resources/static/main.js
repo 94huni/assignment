@@ -539,6 +539,53 @@ $(document).ready(function () {
 
     });
 
+    // 댓글 생성 취소시
+    $(document).on('click', '#commentWriteCancel', function () {
+        $(`.commentWriteInput`).remove();
+        $(`#commentWriteButton`).show();
+    });
+
+    $(document).on('click', '#commentWriteSubmit', function () {
+        const comment = $(`#commentInput`).val();
+        const b_id = $(`#boardId`).val();
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        $.ajax({
+            url: `/api/v1/comment/write/board/${b_id}`,
+            type: 'POST',
+            contentType: 'application/json',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                comment: comment
+            }),
+            success: function (data) {
+                alert(data.result);
+                $(`.comment-container`).remove();
+                $(`.commentWriteInput`).remove();
+                $(`#commentButton`).hide();
+                $(`#commentWriteButton`).show();
+                loadComment(0, b_id, token);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        })
+
+    });
+
     //댓글 보기 버튼
     $(document).on('click', '#commentButton', function () {
         const boardId = document.getElementById("boardId").value;
