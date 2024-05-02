@@ -78,7 +78,7 @@ public class CommentController {
 
     // 해당댓글의 삭제
     @DeleteMapping("/delete/{cId}")
-    public ResponseEntity<Map<String, String>> deleteComment(@PathVariable int cId,
+    public ResponseEntity<Void> deleteComment(@PathVariable int cId,
                                                              Principal principal) {
         Member member = memberService.principalMember(principal);
 
