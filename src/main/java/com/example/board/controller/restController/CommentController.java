@@ -84,10 +84,7 @@ public class CommentController {
 
         commentService.deleteComment(cId, member);
 
-        Map<String, String> result = new HashMap<>();
-        result.put("result", "Delete Success");
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(result);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
