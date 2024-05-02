@@ -636,6 +636,157 @@ $(document).ready(function () {
 
     })
 
+    //댓글 수정
+    $(document).on('click', '.commentUpdateButton', function (event) {
+        event.preventDefault();
+
+        // 숨길 commentResult 를 찾아서 숨김.
+        const commentDiv = $(this).closest(".comment-container");
+        const commentResult = commentDiv.find("#commentResult");
+        commentResult.hide();
+
+        // 새로운 input 요소를 생성하고 추가
+        const commentValue = commentResult.text();
+        const inputElement = $("<input>").attr("type", "text").val(commentValue).addClass("commentInput");
+        commentDiv.append(inputElement);
+
+        // 수정 버튼과 완료 버튼을 생성하고 추가
+        const cancelButton = $("<button>")
+            .addClass("cancelButton")
+            .text("Cancel")
+            .css({
+                "position": "absolute",
+                "top": "0px",
+                "right": "60px", // 버튼 위치 조정
+                "margin": "0 auto",
+                "padding": "2px",
+                "display": "inline-block"
+            });
+
+        const submitButton = $("<button>")
+            .addClass("submitUpdateButton")
+            .text("Submit")
+            .css({
+                "position": "absolute",
+                "top": "0px",
+                "right": "10px",
+                "margin": "0 auto",
+                "padding": "2px",
+                "display": "inline-block"
+            });
+
+        commentDiv.append(cancelButton);
+        commentDiv.append(submitButton);
+    });
+
+    //댓글 수정 취소
+    $(document).on('click', '.cancelButton', function () {
+        const commentDiv = $(this).closest(".comment-container");
+
+        // 새로 추가한 input 요소를 제거
+        commentDiv.find(".commentInput").remove();
+
+        // 숨겼던 commentResult 를 다시 보이도록
+        const commentResult = commentDiv.find("#commentResult");
+        commentResult.show();
+
+        // 생성한 버튼들을 제거
+        $(this).remove();
+        commentDiv.find(".submitUpdateButton").remove();
+    });
+
+    // 댓글수정 요청
+    $(document).on('click', ".submitUpdateButton", function () {
+        const commentDiv = $(this).closest(".comment-container");
+        console.log("div" + commentDiv);
+
+        const c_id = commentDiv.find("#cno").val();
+        console.log("cno " + c_id);
+
+        const content = $('.commentInput').val();
+        console.log("new content : " + content);
+
+        const b_id = $('#boardId').val();
+        console.log("bid : " + b_id);
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        alert("Update?");
+
+        $.ajax({
+            url: `/api/v1/comment/update/${c_id}`,
+            type: 'PUT',
+            contentType: 'application/json',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                comment: content
+            }),
+            success: function (data) {
+                alert(data.result);
+
+                $('.comment-container').remove();
+
+                loadComment(0, b_id, token);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        })
+    });
+
+    $(document).on('click', '.commentDeleteButton', function () {
+        const commentDiv = $(this).closest(".comment-container");
+        console.log("div" + commentDiv);
+
+        const c_id = commentDiv.find("#cno").val();
+        console.log("cno " + c_id);
+        alert("Delete ?");
+
+        const b_id = $('#boardId').val();
+        console.log("bid : " + b_id);
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        $.ajax({
+            url: `/api/v1/comment/delete/${c_id}`,
+            type: 'DELETE',
+            contentType: 'application/json',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function () {
+                alert("Delete success");
+                $('.comment-container').remove();
+
+                loadComment(0, b_id, token);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        })
+    })
     // 댓글 HTML 불러오는 기능
     function loadComment(commentPageNum, bId, token) {
         $.ajax({
@@ -655,15 +806,29 @@ $(document).ready(function () {
                     const date = new Date(dateString);
                     const formattedDate = date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+                    const dateStringUpdate = comment.updateAt;
+                    const updateDate = new Date(dateStringUpdate);
+                    let formattedDateUpdate;
+                    if (dateStringUpdate !== null) {
+                        formattedDateUpdate = updateDate.toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } else {
+                        formattedDateUpdate = null;
+                    }
                     commentHtml += `
-                    <div id="comment_" style="position: relative">
+                    <div class="comment-container"  id="comment_" style="position: relative">
                         <span style="font-weight: bold">${comment.writer}</span>
-                        <input type="hidden" name="cno" value="${comment.cId}">   
-                        <button style="position:absolute; top:0px;right:10px;margin: 0 auto; padding: 2px;" type="submit">x</button>
+                        <input type="hidden" id="cno" value="${comment.cid}">   
+                        <button style="position:absolute; top:0px;right:25px;margin: 0 auto; padding: 2px; font-size: 10px;" type="submit" class="commentUpdateButton">U</button>
+                        <button style="position:absolute; top:0px;right:10px;margin: 0 auto; padding: 2px;" type="submit" class="commentDeleteButton">x</button>
                         <small class="text-body-secondary">${formattedDate}</small>
-                        <p>
-                            <span style="font-size: 12px;">${comment.comment}</span>
-                        </p>
+                        <small class="text-body-secondary">${formattedDateUpdate}</small>
+                        <div style="font-size: 12px;" id="commentResult">${comment.comment}</div>
                         <br>
                     </div>
                 `;
