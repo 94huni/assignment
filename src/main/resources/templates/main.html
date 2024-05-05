@@ -30,10 +30,10 @@
                 <input type="search" id="searchInput" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
                 <button type="submit" class="btn btn-outline-light me-2" id="searchSubmit">Search</button>
             </div><br />
-
-            <button type="button" class="btn btn-outline-light me-2" id="writeForm">write</button>
-
-            <div class="text-end" id="sign" sec:authorize="isAnonymous()">
+            <div th:if="${userEmail != null}">
+                <button type="button" class="btn btn-outline-light me-2" id="writeForm" >write</button>
+            </div>
+            <div class="text-end" id="sign" th:if="${userEmail == null}">
                 <button type="button" class="btn btn-outline-light me-2" id="login-request">Login</button>
                 <button type="button" class="btn btn-warning" id="signUp-button">Sign-up</button>
             </div>
