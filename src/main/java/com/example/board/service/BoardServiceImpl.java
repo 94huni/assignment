@@ -190,6 +190,9 @@ public class BoardServiceImpl implements BoardService {
         } else {
             // 만약 검색어가 존재하면 select * from BOARD where title={keyword} order by create_at desc limit {page}, 10;
             boards = boardRepository.findBoardByTitleContainingOrderByCreateAtDesc(keyword, pageable);
+            if (boards.isEmpty()) {
+                throw new CustomException(ErrorCode.NOT_FOUND_SEARCH_RESULT);
+            }
         }
 
         // 받아온 페이지에서 최대 페이지 보다 입력받은 값이 크거나 0보다 작으면 예외처리
