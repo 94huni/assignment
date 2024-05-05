@@ -28,7 +28,7 @@ public class MainController {
                     String username = memberService.currentMember(jwtToken);
 
                     // 사용자 정보를 모델에 추가
-                    model.addAttribute("userEmail", username);
+                    model.addAttribute("nickName", username);
 
                     break;
                 }
