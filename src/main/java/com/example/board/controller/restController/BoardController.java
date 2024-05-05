@@ -57,7 +57,7 @@ public class BoardController {
 
     // 게시글 업데이트
     @PutMapping("/update/{bId}")
-    public ResponseEntity<String> updateBoard(@PathVariable int bId,
+    public ResponseEntity<Map<String, String>> updateBoard(@PathVariable int bId,
                                               @RequestBody BoardUpdate update,
                                               Principal principal) {
 
@@ -65,7 +65,9 @@ public class BoardController {
 
         boardService.updateBoard(bId, update, member);
 
-        return ResponseEntity.ok("Update Successful");
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "Update Successful");
+        return ResponseEntity.ok(result);
     }
     
     // 게시글 삭제
