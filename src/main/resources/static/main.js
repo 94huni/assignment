@@ -373,8 +373,9 @@ $(document).ready(function () {
     // 검색 요청
     $(document).on('click', '#searchSubmit', function () {
         const keyword = document.getElementById('searchInput').value;
+        console.log(keyword);
         deleteDiv();
-        loadBoardList(0, keyword);
+        loadBoardSearchList(0, keyword);
     });
     //리스트 페이지 불러오기
     function loadBoardList(pageNumber) {
@@ -487,6 +488,7 @@ $(document).ready(function () {
         });
     }
 
+    //검색어 있을 시 페이지 불러오기
     function loadBoardSearchList(pageNumber, keyword) {
         $.ajax({
             url: `/api/v1/board/list`,
@@ -543,7 +545,7 @@ $(document).ready(function () {
                                     </a>
                                 </li>
                                 `;
-                } else if (pageNumber === response.totalPages - 1) { // 현재 페이지가 마지막 페이지인 경우
+                } else if (pageNumber === parseInt(response.totalPages) - 1) { // 현재 페이지가 마지막 페이지인 경우
                     pageHtml += `
                                 <li class="page-item">
                                     <a class="page-link page-back-button" href="#" id="pageBackButton" aria-label="Previous">
@@ -1000,6 +1002,7 @@ $(document).ready(function () {
         })
     });
 
+    // 댓글 삭제 요청
     $(document).on('click', '.commentDeleteButton', function () {
         const commentDiv = $(this).closest(".comment-container");
         console.log("div" + commentDiv);
