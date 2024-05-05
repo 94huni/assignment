@@ -59,9 +59,11 @@ $(document).ready(function () {
 
                 console.log("token : ", token);
 
-                $(`#sign`).remove();
+                // $(`#sign`).remove();
+                //
+                // $(`.login-page`).remove();
 
-                $(`.login-page`).remove();
+                location.reload();
 
                 const pageNum = getPageNumberFromCookie();
                 if (pageNum) {
@@ -80,6 +82,13 @@ $(document).ready(function () {
             }
         });
 
+    });
+
+    // 로그아웃
+    $(document).on('click', '#logout', function () {
+        const token = 'token';
+        document.cookie = token + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        location.reload();
     });
 
     //회원가입 버튼
@@ -620,12 +629,16 @@ $(document).ready(function () {
                             <div class="card-body">
                                 <input type="hidden" id="boardId" value="${bId}">
                                 <h5 class="card-title" id="postTitle">${board.title}</h5>
+                                <h7 class="card-writer" id="writer">writer : ${board.nickname}</h7>
                                 <p class="card-text" id="postContent">${board.content}</p>
                                 <small class="text-body-secondary" id="createAt">${formattedDate}</small>
                             </div>
                         </div>
                         <a id="backButton" class="btn btn-primary mt-3">List</a>
-                        <a id="updateButton" class="btn btn-primary mt-3">Update</a>
+                        <div>
+                            <a id="updateButton" class="btn btn-primary mt-3">Update</a>
+                            <a id="deleteButton" class="btn btn-primary mt-3">Delete</a>
+                        </div>
                         <a id="commentButton" class="btn btn-primary mt-3">Comment List</a>
                         <a id="commentWriteButton" class="btn btn-primary mt-3">Comment Write</a>
                         <br />
@@ -642,6 +655,43 @@ $(document).ready(function () {
             }
         });
     });
+
+    // 게시글 삭제
+    $(document).on('click', '#deleteButton', function () {
+        confirm("Delete ?")
+
+        const bId = $('#boardId').val();
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        $.ajax({
+            url: `/api/v1/board/delete/${bId}`,
+            type: 'DELETE',
+            contentType: 'application/json',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function (data) {
+                alert("Delete Success");
+
+                location.reload();
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        })
+
+    })
 
     // 댓글 업데이트 버튼
     $(document).on('click', '#updateButton', function () {
