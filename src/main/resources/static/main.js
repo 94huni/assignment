@@ -248,12 +248,16 @@ $(document).ready(function () {
         const keywordElement = document.getElementById('keyword');
         const keyword = keywordElement ? keywordElement.value : null;
 
-        console.log("pageContinue : " + totalPages);
+        console.log("pageContinue : " + totalPages - 1);
         const result = parseInt(totalPages);
-        loadBoardList(result - 1, keyword);
+        if (keyword === null) {
+            loadBoardList(result - 1);
+        } else {
+            loadBoardSearchList(result - 1, keyword);
+        }
     });
 
-    //뒤로가기 페이지 버튼
+    //First 페이지 버튼
     $(document).on('click', '.page-back-button', function () {
         console.log("page back button : " + pageNumber)
         const keywordElement = document.getElementById('keyword');
@@ -261,7 +265,11 @@ $(document).ready(function () {
 
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
-        loadBoardList(0, keyword);
+        if (keyword === null) {
+            loadBoardList(0);
+        } else {
+            loadBoardSearchList(0, keyword);
+        }
     });
 
     //페이지 이동 버튼
@@ -273,7 +281,11 @@ $(document).ready(function () {
         console.log("page link page : " + pageNumber)
         $(`.card-body`).remove();
         $(`.pageRequest`).remove();
-        loadBoardList(pageNumber, keyword);
+        if (keyword === null) {
+            loadBoardList(pageNumber);
+        } else {
+            loadBoardSearchList(pageNumber, keyword);
+        }
     })
 
     //글쓰기 페이지 호출
@@ -349,25 +361,28 @@ $(document).ready(function () {
         });
     });
 
+    // 검색 요청
     $(document).on('click', '#searchSubmit', function () {
         const keyword = document.getElementById('searchInput').value;
         deleteDiv();
         loadBoardList(0, keyword);
     });
     //리스트 페이지 불러오기
-    function loadBoardList(pageNumber, keyword) {
+    function loadBoardList(pageNumber) {
         $.ajax({
             url: `/api/v1/board/list`,
             type: "GET",
             dataType: 'json',
             data: {
-                page: pageNumber,
-                keyword: keyword
+                page: pageNumber
             },
             success: function (response) {
                 const board = response.content;
                 console.log(response.content);
-                console.log(response.totalPages);
+                console.log("pageNumber : " + pageNumber);
+                console.log("totalPages :" + response.totalPages);
+
+                const pageNum = parseInt(pageNumber);
 
                 let cardHtml;
                 for (const result of board) {
@@ -386,9 +401,114 @@ $(document).ready(function () {
                             <h5 class="card-title"><a class="post-link">${result.title}</a></h5>
                             <p class="card-text">${result.content}</p>
                              <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>               
-                                </div>
+                                <small class="text-body-secondary">${formattedDate}</small>
+                            </div>
+                        </div>`;
+
+                    $('.card-container').append(cardHtml);
+
+                    $('#continueButton').hide();
+                }
+                let pageHtml = `
+                                <nav aria-label="Page navigation" class="pageRequest">
+                                    <ul class="pagination">
+                                `;
+
+                if (pageNumber === 0) {
+                    pageHtml += `
+                              
+                                <li class="page-item"><a class="page-link page-select bg-primary text-white" href="#" id="0">1</a></li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="1">2</a></li>
+                                <li class="page-item">
+                                    <a class="page-link last-page" href="#" id="pageContinueButton" aria-label="Next" data-total-pages="${response.totalPages}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                    </a>
+                                </li>
+                                `;
+                } else if (pageNumber === parseInt(response.totalPages) - 1) { // 현재 페이지가 마지막 페이지인 경우
+                    pageHtml += `
+                                <li class="page-item">
+                                    <a class="page-link page-back-button" href="#" id="pageBackButton" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                    </a>
+                                </li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNum - 2}">${pageNum - 1}</a></li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNum - 1}">${pageNum}</a></li>
+                                <li class="page-item"><a class="page-link page-select bg-primary text-white" href="#" id="${pageNum}">${pageNum + 1}</a></li>
+                                `;
+                } else { // 그 외의 경우
+                    pageHtml += `
+                                <li class="page-item">
+                                    <a class="page-link page-back-button" href="#" id="pageBackButton" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                    </a>
+                                </li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNum - 1}">${pageNum}</a></li>
+                                <li class="page-item"><a class="page-link page-select bg-primary text-white" href="#" id="${pageNum}">${pageNum + 1}</a></li>
+                                <li class="page-item"><a class="page-link page-select" href="#" id="${pageNum + 1}">${pageNum + 2}</a></li>
+                                <li class="page-item">
+                                    <a class="page-link last-page" href="#" id="pageContinueButton" aria-label="Next" data-total-pages="${response.totalPages}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                    </a>
+                                </li>
+                                `;
+                }
+
+                pageHtml += `
+                                </ul>
+                            </nav>
+                            `;
+
+                $('.pageContainer').append(pageHtml);
+            },
+            error: function (xhr, status, error) {
+
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                    location.reload();
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        });
+    }
+
+    function loadBoardSearchList(pageNumber, keyword) {
+        $.ajax({
+            url: `/api/v1/board/list`,
+            type: "GET",
+            dataType: 'json',
+            data: {
+                page: pageNumber,
+                keyword: keyword
+            },
+            success: function (response) {
+                const board = response.content;
+                console.log("content : " + response.content);
+                console.log("totalPage : " +response.totalPages);
+
+                let cardHtml;
+                for (const result of board) {
+                    const dateString = result.createAt;
+
+                    const date = new Date(dateString);
+
+                    const formattedDate =
+                        date.toLocaleDateString('ko-KR',
+                            { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+                    const bId = result.bid;
+                    cardHtml = `
+                        <div class="card-body">
+                            <p class="bid">${bId}</p>
+                            <h5 class="card-title"><a class="post-link">${result.title}</a></h5>
+                            <p class="card-text">${result.content}</p>
+                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-body-secondary">${formattedDate}</small>
                             </div>
                         </div>`;
@@ -445,7 +565,6 @@ $(document).ready(function () {
                                 </li>
                                 `;
                 }
-
                 pageHtml += `
                                 </ul>
                             </nav>
@@ -494,7 +613,7 @@ $(document).ready(function () {
                 const formattedDate = date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
                 console.log(board);
                 const cardHtml = `
-                    <div class="container" id="details">
+                    <div class="detailsContainer" id="details">
                         <h1 class="mt-5">게시물 상세 페이지</h1>
                         <hr>
                         <div class="card mt-4">
@@ -502,7 +621,7 @@ $(document).ready(function () {
                                 <input type="hidden" id="boardId" value="${bId}">
                                 <h5 class="card-title" id="postTitle">${board.title}</h5>
                                 <p class="card-text" id="postContent">${board.content}</p>
-                                <small class="text-body-secondary">${formattedDate}</small>
+                                <small class="text-body-secondary" id="createAt">${formattedDate}</small>
                             </div>
                         </div>
                         <a id="backButton" class="btn btn-primary mt-3">List</a>
@@ -524,6 +643,90 @@ $(document).ready(function () {
         });
     });
 
+    // 댓글 업데이트 버튼
+    $(document).on('click', '#updateButton', function () {
+        const bId = $(`#boardId`).val();
+        const title = $(`#postTitle`).text();
+        const content = $(`#postContent`).text();
+
+        console.log("title & content : " + title + " " + content);
+
+        const writeFormHtml = `
+            <div class="update-container" id="boardUpdate" xmlns="http://www.w3.org/1999/html">
+                        <h1 class="mt-5">Update</h1>
+                        <hr>
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <input type="hidden" id="boardId" value="${bId}" />
+                                <input type="text" id="title" value="${title}" /><br />
+                                <textarea type="text" id="content">${content}</textarea>
+                            </div>
+                        </div>
+                        <a id="boardUpdateButton" class="btn btn-primary mt-3">Update</a>
+                        <a id="boardUpdateCancel" class="btn btn-primary mt-3">Cancel</a>
+            </div>
+        `;
+
+        $('.updateFrom').html(writeFormHtml);
+        $(`.detailsContainer`).hide();
+    });
+
+    // 게시물 수정 취소
+    $(document).on('click', '#boardUpdateCancel', function () {
+        $(`.detailsContainer`).show();
+        $(`#boardUpdate`).remove();
+    });
+
+    // 게시물 수정 요청
+    $(document).on('click', '#boardUpdateButton', function () {
+        const bId = $(`#boardId`).val();
+        const title = $(`#title`).val();
+        const content = $(`#content`).val();
+
+        console.log("title & content : " + title + " " + content);
+
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        if (title.trim() === '') {
+            alert("title not found");
+            return;
+        }
+
+        $.ajax({
+            url: `/api/v1/board/update/${bId}`,
+            type: 'PUT',
+            dataType: 'json',
+            contentType: "application/json",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                title: title,
+                content: content
+            }),
+            success: function (data) {
+                alert(data.message);
+                $(`#boardUpdate`).remove();
+
+                loadBoardList(0, null);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                if (xhr.responseJSON) {
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.code + " " + errorResponse.message);
+                } else {
+                    alert("An error occurred while processing your request.");
+                }
+            }
+        });
+    });
+
+    // 댓글 쓰기 버튼
     $(document).on('click', '#commentWriteButton', function () {
         $(`#commentWriteButton`).hide();
 
@@ -545,6 +748,7 @@ $(document).ready(function () {
         $(`#commentWriteButton`).show();
     });
 
+    // 댓글 쓰기 요청
     $(document).on('click', '#commentWriteSubmit', function () {
         const comment = $(`#commentInput`).val();
         const b_id = $(`#boardId`).val();
