@@ -1,6 +1,6 @@
 // GET /api/v1/board/list
 $(document).ready(function () {
-    $('#writeForm').hide();
+    // $('#writeForm').hide();
     let pageNumber = 0;
 
     // 로그인페이지
@@ -50,7 +50,7 @@ $(document).ready(function () {
                 const token = data.token;
 
                 const expiresDate = new Date();
-                expiresDate.setTime(expiresDate.getTime() + (60 * 60 * 1000)); // 1시간 후
+                expiresDate.setTime(expiresDate.getTime() + (30 * 60 * 1000)); // 30분
 
 
                 const expires = `expires=${expiresDate.toUTCString()}`;
