@@ -72,13 +72,13 @@ public class BoardController {
     
     // 게시글 삭제
     @DeleteMapping("/delete/{bId}")
-    public ResponseEntity<String> deleteBoard(@PathVariable int bId,
+    public ResponseEntity<Void> deleteBoard(@PathVariable int bId,
                                               Principal principal) {
 
         Member member = memberService.principalMember(principal);
 
         boardService.deleteBoard(bId, member);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete Successful");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
