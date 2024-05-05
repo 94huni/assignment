@@ -4,6 +4,7 @@ import com.example.board.data.entity.Member;
 import com.example.board.data.requestDto.MemberSignUp;
 import com.example.board.data.requestDto.MemberUpdate;
 import com.example.board.data.requestDto.SignIn;
+import com.example.board.data.responseDto.MemberResponse;
 import com.example.board.service.impl.MemberService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,11 @@ public class MemberController {
         result.put("message", "Membership registration completed");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(result); // 새로운 정보 생성을 했기 때문에 201 Created
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<MemberResponse> memberInfo(Principal principal) {
+        return ResponseEntity.ok(memberService.getMember(principal.getName()));
     }
 
     @PutMapping("/update")
