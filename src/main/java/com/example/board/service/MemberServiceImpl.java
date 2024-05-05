@@ -57,7 +57,10 @@ public class MemberServiceImpl implements MemberService {
     // 토큰으로 현재 접속된 email 반환
     @Override
     public String currentMember(String token) {
-        return jwtProvider.getUsername(token);
+        String email =  jwtProvider.getUsername(token);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+        return member.getNickname();
     }
 
     // 로그인
