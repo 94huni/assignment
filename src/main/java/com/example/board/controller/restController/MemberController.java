@@ -60,7 +60,7 @@ public class MemberController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<String> memberUpdate(Principal principal,
+    public ResponseEntity<Map<String, String>> memberUpdate(Principal principal,
                                                @Valid @RequestBody MemberUpdate memberUpdate) {
 
         //현재 로그인된 정보
@@ -70,7 +70,10 @@ public class MemberController {
         memberService.updateMember(memberUpdate, member);
         log.info("Current Member email : {}", member.getEmail());
 
-        return ResponseEntity.ok("Successfully changed membership information");
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "Successfully changed membership information");
+
+        return ResponseEntity.ok(result);
     }
 
     @Hidden
