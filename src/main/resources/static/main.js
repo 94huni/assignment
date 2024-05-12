@@ -249,6 +249,78 @@ $(document).ready(function () {
         });
     });
 
+    // 현재 접속정보
+    $(document).on('click', '#memberInfoForm', function() {
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        $.ajax({
+            url: "/api/v1/member/info",
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function (member) {
+
+                console.log(member);
+                deleteDiv();
+                const infoHtml = `
+                <div class="container mt-5" id="memberInfo">
+                    <h2>User Information</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                            <label>ID:</label>
+                            <input type="text" class="form-control" id="memberId" value="${member.id}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Nickname:</label>
+                            <input type="text" class="form-control" id="memberNickname" value="${member.nickname}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Username:</label>
+                            <input type="text" class="form-control" id="memberUsername" value="${member.userName}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" class="form-control" id="memberEmail" value="${member.email}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone:</label>
+                            <input type="text" class="form-control" id="memberPhone" value="${member.phone}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Created At:</label>
+                            <input type="text" class="form-control" value="${member.createAt}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Updated At:</label>
+                            <input type="text" class="form-control" value="${member.updateAt}" readonly>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-light me-2" id="memberUpdateForm" >Update</button>
+                    </div>
+                </div>
+                `;
+
+                $('#details').remove();
+
+                $('.member-info').append(infoHtml);
+            },
+            error: function (xhr, textStatus, errorThrown){
+                const errorResponse = xhr.responseJSON;
+                alert(errorResponse.code + " " + errorResponse.message);
+            }
+        })
+    });
+
     //마지막 페이지 버튼
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
@@ -377,6 +449,7 @@ $(document).ready(function () {
         deleteDiv();
         loadBoardSearchList(0, keyword);
     });
+
     //리스트 페이지 불러오기
     function loadBoardList(pageNumber) {
         $.ajax({

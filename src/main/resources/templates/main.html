@@ -32,6 +32,7 @@
             </div><br />
             <div th:if="${nickName != null}">
                 <button type="button" class="btn btn-outline-light me-2" id="writeForm" >write</button>
+                <button type="button" class="btn btn-outline-light me-2" id="memberInfoForm" >Info</button>
                 <button type="button" class="btn btn-outline-light me-2" id="logout" >logout</button>
             </div>
             <div class="text-end" id="sign" th:if="${nickName == null}">
@@ -43,6 +44,7 @@
 </header>
 <button id="continueButton">continue</button>
 <div class="login-page"></div>
+<div class="member-info"></div>
 <div class="signUp-page"></div>
 <div class="card-container"></div>
 <div class="updateFrom"></div>
