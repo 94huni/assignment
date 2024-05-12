@@ -321,6 +321,89 @@ $(document).ready(function () {
         })
     });
 
+    //
+    $(document).on('click', '#memberUpdateForm', function () {
+        const id = $('#memberId').val();
+        const nickname = $('#memberNickname').val();
+        const username = $('#memberUsername').val();
+        const email = $('#memberEmail').val();
+        const phone = $('#memberPhone').val();
+
+        $('#memberInfo').remove();
+
+        const updateHtml = `
+        <div class="container mt-5" id="memberUpdate-form">
+        <h2>Member SignUp Form</h2>
+            <hr>
+            <input type="hidden" id="mid" value="${id}">
+            <div class="mb-3">
+                <label for="userName" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="userName" value="${username}" required>
+            </div>
+            <div class="mb-3">
+                <label for="nickName" class="form-label">Nick Name</label>
+                <input type="text" class="form-control" id="nickName" value="${nickname}" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+            </div>
+            <div class="mb-3">
+                <label for="validPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="validPassword" placeholder="Enter password again" required>
+                <span id="passwordMatch" style="color:#ff0000;">Passwords do not match</span>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="phone" value="${phone}" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" value="${email}" readonly>
+            </div>
+            <button type="submit" class="btn btn-primary" id="memberUpdateSubmit">Submit</button>
+        </div>
+        `;
+
+        $('.signUp-page').append(updateHtml);
+    });
+
+    $(document).on('click', '#memberUpdateSubmit', function () {
+        const id = $('#mid').val();
+        const password = $('#password').val();
+        const validPassword = $('#validPassword').val();
+        const token = getJWTFromCookie();
+
+        if (token === null) {
+            alert("Not Login");
+            return;
+        }
+
+        $.ajax({
+            url: "/api/v1/member/update",
+            type: "PUT",
+            dataType: "json",
+            contentType: "application/json",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            data: JSON.stringify({
+                nickname: null,
+                password: password,
+                validPassword: validPassword
+            }),
+            success: function (data) {
+                alert(data.message);
+
+                location.reload();
+            },
+            error: function (xhr, textStatus, errorThrown){
+                const errorResponse = xhr.responseJSON;
+                alert(errorResponse.code + " " + errorResponse.message);
+            }
+        })
+    });
+
     //마지막 페이지 버튼
     $(document).on('click', '#pageContinueButton', function () {
         $(`.card-body`).remove();
