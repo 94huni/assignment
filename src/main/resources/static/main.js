@@ -4,6 +4,7 @@ $(document).ready(function () {
     let pageNumber = 0;
 
     // 로그인페이지
+    // login page
     $(document).on('click', `#login-request`, function () {
         // 쓰지않는 페이지들 보이지 않게
         $('#continueButton').hide();
@@ -321,7 +322,7 @@ $(document).ready(function () {
         })
     });
 
-    //
+    // 회원정보 수정
     $(document).on('click', '#memberUpdateForm', function () {
         const id = $('#memberId').val();
         const nickname = $('#memberNickname').val();
@@ -362,12 +363,14 @@ $(document).ready(function () {
                 <input type="email" class="form-control" id="email" value="${email}" readonly>
             </div>
             <button type="submit" class="btn btn-primary" id="memberUpdateSubmit">Submit</button>
+            <button type="submit" class="btn btn-primary" id="memberDelete">Withdrawal</button>
         </div>
         `;
 
         $('.signUp-page').append(updateHtml);
     });
 
+    // 회원정보 수정 요청
     $(document).on('click', '#memberUpdateSubmit', function () {
         const id = $('#mid').val();
         const password = $('#password').val();
@@ -530,6 +533,7 @@ $(document).ready(function () {
         const keyword = document.getElementById('searchInput').value;
         console.log(keyword);
         deleteDiv();
+        $('#details').remove();
         loadBoardSearchList(0, keyword);
     });
 
