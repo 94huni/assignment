@@ -178,23 +178,32 @@ public class MemberServiceImpl implements MemberService {
                 throw new CustomException(ErrorCode.DIFFERENT_PASSWORD);
 
             // 닉네임만 변경 가능함으로 닉네임 중복확인
-            if(memberRepository.existsByNickname(memberUpdate.getNickname()))
+            if(memberRepository.existsByNickname(memberUpdate.getNickname()) && memberUpdate.getNickname() != null)
                 throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
 
+            // 닉네임의 값은 안들어올 수도 있기 때문에 null 값 요청시 member 에 저장된 nickname 사용
+            String nickname = (null == memberUpdate.getNickname()) ? member.getNickname() : memberUpdate.getNickname();
 
             // toBuilder 사용하여 바뀐부분 바꿔줌
             Member result = member.toBuilder()
                     .mId(member.getMId())
-                    .nickname(memberUpdate.getNickname())
+                    .nickname(nickname)
                     .password(passwordEncoder.encode(memberUpdate.getPassword()))
                     .updateAt(LocalDateTime.now())
                     .build();
 
 
             memberRepository.save(result);
+        } catch (CustomException e) {
+
+            log.error(e.getMessage());
+            throw new CustomException(e.getErrorCode());
+
         } catch (Exception e) {
+
             log.error(e.getMessage());
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+
         }
     }
 }
